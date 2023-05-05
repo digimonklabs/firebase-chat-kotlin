@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View" />
+
+        <variable
+            name="chatFragment"
+            type="com.firebase.chat.ui.fragment.Chatting" />
+
+        <variable
+            name="adapter"
+            type="com.firebase.chat.ui.adapter.ChatListAdapter" />
+
+        <variable
+            name="viewModel"
+            type="com.firebase.chat.ui.viewmodel.ChatListViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        tools:context=".ui.fragment.Chatting">
+
+        <SearchView
+            android:id="@+id/searchView"
+            android:layout_marginTop="@dimen/sw_10sp"
+            android:background="@drawable/bg_searchview"
+            android:focusable="false"
+            android:iconifiedByDefault="false"
+            android:queryHint="Search"
+            android:searchHintIcon="@drawable/ic_search_black_24dp"
+            android:searchIcon="@drawable/ic_search_black_24dp"
+            android:theme="@style/MySearchViewStyle"
+            android:layout_marginHorizontal="@dimen/sw_20dp"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/sw_40dp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvChat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/sw_20dp"
+            android:text="@string/chat"
+            android:layout_marginTop="@dimen/sw_10sp"
+            android:visibility="gone"
+            android:textColor="@color/black"
+            android:textSize="@dimen/sw_12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/searchView" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvNoFriends"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textSize="@dimen/sw_14sp"
+            android:gravity="center"
+            android:visibility="@{viewModel.noFriend ? View.VISIBLE : View.GONE}"
+            android:layout_marginHorizontal="@dimen/sw_20dp"
+            app:layout_constraintVertical_chainStyle="packed"
+            android:text="@string/you_don_t_have_any_friends_to_chatting_please_add_friend"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/btnAddFriend"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddFriend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/sw_20dp"
+            android:layout_marginTop="@dimen/sw_10dp"
+            android:paddingVertical="@dimen/sw_10dp"
+            android:text="@string/add_friends"
+            android:visibility="@{viewModel.noFriend ? View.VISIBLE : View.GONE}"
+            android:onClick="@{ (v) -> chatFragment.onAddFriend()}"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sw_14sp"
+            app:cornerRadius="@dimen/sw_6dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvNoFriends" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvUsers"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/sw_0dp"
+            android:layout_marginTop="@dimen/sw_10dp"
+            android:adapter="@{adapter}"
+            android:orientation="vertical"
+            android:visibility="@{viewModel.noFriend ? View.GONE : View.VISIBLE}"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvChat" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

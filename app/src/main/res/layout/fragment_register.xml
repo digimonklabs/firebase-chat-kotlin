@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="register"
+            type="com.firebase.chat.ui.fragment.Register" />
+
+        <variable
+            name="viewModel"
+            type="com.firebase.chat.ui.viewmodel.RegisterViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        tools:context=".ui.fragment.Register">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/sw_14dp"
+            android:elevation="@dimen/sw_2dp"
+            android:onClick="@{ () -> viewModel.navigateBack()}"
+            android:layout_marginStart="@dimen/sw_10dp"
+            app:layout_constraintTop_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:src="@drawable/ic_back_arrow"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/ivRegister"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/sw_0dp"
+                    app:layout_constraintHeight_percent="0.4"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:src="@drawable/login_image" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/tvSignUp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@+id/ivRegister"
+                    android:layout_margin="@dimen/sw_20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:text="@string/sign_up"
+                    android:textSize="@dimen/sw_22sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/etEmailLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/sw_20sp"
+                    android:layout_marginTop="@dimen/sw_10dp"
+                    app:layout_constraintTop_toBottomOf="@+id/tvSignUp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableStart="@drawable/ic_email"
+                        android:drawablePadding="@dimen/sw_10dp"
+                        android:hint="@string/email_id"
+                        android:text="@={viewModel.registerEmail}"
+                        android:imeOptions="actionNext"
+                        android:inputType="textEmailAddress" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/etNameLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/sw_20sp"
+                    android:layout_marginTop="@dimen/sw_10dp"
+                    app:layout_constraintTop_toBottomOf="@+id/etEmailLayout">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableStart="@drawable/ic_name"
+                        android:drawablePadding="@dimen/sw_10dp"
+                        android:hint="@string/full_name"
+                        android:text="@={viewModel.registerName}"
+                        android:imeOptions="actionNext"
+                        android:inputType="text" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/etPasswordLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/sw_20sp"
+                    android:layout_marginTop="@dimen/sw_10dp"
+                    app:layout_constraintTop_toBottomOf="@+id/etNameLayout"
+                    app:passwordToggleEnabled="true">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableStart="@drawable/ic_password"
+                        android:text="@={viewModel.registerPassword}"
+                        android:drawablePadding="@dimen/sw_10dp"
+                        android:hint="@string/password"
+                        android:imeOptions="actionDone"
+                        android:inputType="textPassword" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRegister"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/sw_20dp"
+                    android:layout_marginTop="@dimen/sw_20dp"
+                    android:paddingVertical="@dimen/sw_10dp"
+                    android:text="@string/key_continue"
+                    android:onClick="@{ (v) -> register.onRegisterClick()}"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/sw_14sp"
+                    app:cornerRadius="@dimen/sw_6dp"
+                    app:layout_constraintTop_toBottomOf="@+id/etPasswordLayout" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:textSize="@dimen/sw_12sp"
+                    android:onClick="@{ (v) -> register.onLoginClick()}"
+                    app:layout_constraintTop_toBottomOf="@+id/btnRegister"
+                    android:layout_marginTop="@dimen/sw_10dp"
+                    android:text="@string/already_account" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

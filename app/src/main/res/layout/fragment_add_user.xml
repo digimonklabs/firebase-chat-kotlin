@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="addUser"
+            type="com.firebase.chat.ui.fragment.AddUser" />
+
+        <variable
+            name="viewModel"
+            type="com.firebase.chat.ui.viewmodel.ChatListViewModel" />
+
+        <variable
+            name="adapter"
+            type="com.firebase.chat.ui.adapter.AddFriendsAdapter" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.fragment.AddUser">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/sw_10sp"
+            android:layout_marginTop="@dimen/sw_14dp"
+            android:onClick="@{ () -> viewModel.navigateBack()}"
+            android:src="@drawable/ic_back_arrow"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="@dimen/sw_0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/sw_10sp"
+            android:text="@string/add_friends"
+            android:textSize="@dimen/sw_18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/ivBack"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/ivBack"
+            app:layout_constraintTop_toTopOf="@+id/ivBack" />
+
+        <SearchView
+            android:id="@+id/searchFriend"
+            android:layout_marginTop="@dimen/sw_10sp"
+            android:background="@drawable/bg_searchview"
+            android:focusable="false"
+            android:iconifiedByDefault="false"
+            android:queryHint="Search"
+            android:searchHintIcon="@drawable/ic_search_black_24dp"
+            android:searchIcon="@drawable/ic_search_black_24dp"
+            android:theme="@style/MySearchViewStyle"
+            android:layout_marginHorizontal="@dimen/sw_20dp"
+            android:layout_width="match_parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivBack"
+            android:layout_height="@dimen/sw_40dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/sw_0dp"
+            android:layout_marginVertical="@dimen/sw_10sp"
+            android:adapter="@{adapter}"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@+id/btnAddFriend"
+            app:layout_constraintTop_toBottomOf="@+id/searchFriend" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddFriend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/sw_20dp"
+            android:layout_marginTop="@dimen/sw_10dp"
+            android:layout_marginBottom="@dimen/sw_10sp"
+            app:icon="@android:drawable/ic_input_add"
+            app:iconGravity="textStart"
+            android:onClick="@{ (v) -> addUser.onAddClick()}"
+            android:paddingVertical="@dimen/sw_10dp"
+            android:text="@string/add"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sw_14sp"
+            app:cornerRadius="@dimen/sw_6dp"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

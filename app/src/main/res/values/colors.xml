@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="colorPrimary">#FF9800</color>
+    <color name="colorPrimaryLight">#F9E4CB</color>
+    <color name="colorReceiverBackground">#E0E0E0</color>
+    <color name="colorSenderText">#2A0F00</color>
+    <color name="colorReceiverText">#333333</color>
+    <color name="colorForgotPassword">#0165FE</color>
+    <color name="colorGoogleButton">#F1F6F7</color>
+    <color name="colorLightGray">#707070</color>
+    <color name="colorSearchView">#E7E8EC</color>
+    <color name="colorSeafffrchView">#66FF00</color>
+</resources>

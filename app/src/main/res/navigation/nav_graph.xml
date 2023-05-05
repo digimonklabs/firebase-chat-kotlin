@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/dashBoardFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.firebase.chat.ui.fragment.Login"
+        tools:layout="@layout/fragment_login">
+
+        <action
+            android:id="@+id/loginToRegisterFragment"
+            app:destination="@+id/registerFragment" />
+
+        <action
+            android:id="@+id/loginToForgotPasswordFragment"
+            app:destination="@+id/forgotPassword" />
+
+        <action
+            android:id="@+id/loginToChattingFragment"
+            app:destination="@+id/chattingFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/dashBoardFragment"
+        android:name="com.firebase.chat.ui.fragment.DashBoard"
+        tools:layout="@layout/fragment_dash_board">
+
+        <action
+            android:id="@+id/dashBoardToLoginFragment"
+            app:destination="@+id/loginFragment" />
+
+        <action
+            android:id="@+id/dashBoardToChattingFragment"
+            app:destination="@+id/chattingFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.firebase.chat.ui.fragment.Register"
+        tools:layout="@layout/fragment_register">
+
+        <action
+            android:id="@+id/registerToLoginFragment"
+            app:destination="@+id/loginFragment" />
+
+        <action
+            android:id="@+id/registerToChattingFragment"
+            app:destination="@+id/chattingFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/forgotPassword"
+        android:name="com.firebase.chat.ui.fragment.ForgotPassword"
+        tools:layout="@layout/fragment_forgot_password">
+
+    </fragment>
+
+    <fragment
+        android:name="com.firebase.chat.ui.fragment.Chatting"
+        android:id="@+id/chattingFragment"
+        tools:layout="@layout/fragment_chatting">
+
+            <action
+                android:id="@+id/addUserToChattingFragment"
+                app:destination="@+id/addUserFragment" />
+
+            <action
+                android:id="@+id/chattingToChattingDetailFragment"
+                app:destination="@+id/chatDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/chatDetailFragment"
+        android:name="com.firebase.chat.ui.fragment.ChattingDetail"
+        tools:layout="@layout/fragment_chating_details">
+
+        <argument
+            android:name="receiverId"
+            app:argType="string" />
+
+    </fragment>
+
+    <fragment
+        android:name="com.firebase.chat.ui.fragment.AddUser"
+        tools:layout="@layout/fragment_add_user"
+        android:id="@+id/addUserFragment">
+
+    </fragment>
+</navigation>

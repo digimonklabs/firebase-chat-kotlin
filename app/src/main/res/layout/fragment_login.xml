@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="login"
+            type="com.firebase.chat.ui.fragment.Login" />
+
+        <variable
+            name="viewModel"
+            type="com.firebase.chat.ui.viewmodel.LoginViewModel" />
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        tools:context=".ui.fragment.Login">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivLogin"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:src="@drawable/login_image"
+            app:layout_constraintHeight_percent="0.4"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/sw_20sp"
+            android:layout_marginTop="@dimen/sw_6dp"
+            android:text="@string/login"
+            android:textSize="@dimen/sw_22sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivLogin" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/etEmailLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/sw_20sp"
+            android:layout_marginTop="@dimen/sw_10dp"
+            app:layout_constraintTop_toBottomOf="@+id/tvLogin">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_email"
+                android:drawablePadding="@dimen/sw_10dp"
+                android:text="@={viewModel.loginEmail}"
+                android:hint="@string/email_id"
+                android:imeOptions="actionNext"
+                android:inputType="textEmailAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/etPasswordLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/sw_20sp"
+            android:layout_marginTop="@dimen/sw_10dp"
+            app:layout_constraintTop_toBottomOf="@+id/etEmailLayout"
+            app:passwordToggleEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_password"
+                android:drawablePadding="@dimen/sw_10dp"
+                android:hint="@string/password"
+                android:text="@={viewModel.loginPassword}"
+                android:imeOptions="actionDone"
+                android:inputType="textPassword" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvForgotPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/sw_10dp"
+            android:layout_marginEnd="@dimen/sw_20dp"
+            android:text="@string/forgot_password"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/sw_14sp"
+            android:onClick="@{ (v) -> login.onForgotPasswordClick()}"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etPasswordLayout" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/sw_20dp"
+            android:layout_marginTop="@dimen/sw_10dp"
+            android:paddingVertical="@dimen/sw_10dp"
+            android:text="@string/login"
+            android:onClick="@{ (v) -> login.onLoginClick()}"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sw_14sp"
+            app:cornerRadius="@dimen/sw_6dp"
+            app:layout_constraintTop_toBottomOf="@+id/tvForgotPassword" />
+
+        <com.firebase.chat.utils.LoadingSpinner
+            android:id="@+id/loader"
+            android:layout_width="@dimen/sw_12sp"
+            android:layout_height="@dimen/sw_12sp"
+            android:elevation="@dimen/sw_5dp"
+            app:layout_constraintStart_toStartOf="@+id/btnLogin"
+            app:layout_constraintEnd_toEndOf="@+id/btnLogin"
+            app:layout_constraintTop_toTopOf="@+id/btnLogin"
+            app:layout_constraintBottom_toBottomOf="@+id/btnLogin" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvOr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/sw_12dp"
+            android:text="@string/or"
+            android:textAllCaps="true"
+            android:textSize="@dimen/sw_12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGoogle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/sw_20dp"
+            android:layout_marginTop="@dimen/sw_12dp"
+            android:backgroundTint="@color/colorGoogleButton"
+            android:paddingVertical="@dimen/sw_10dp"
+            android:text="@string/login_with_google"
+            android:textColor="@color/black"
+            app:cornerRadius="@dimen/sw_6dp"
+            android:textSize="@dimen/sw_14sp"
+            android:onClick="@{ (v) -> login.onLoginGoogleClick()}"
+            app:icon="@drawable/icon_google"
+            app:iconGravity="textStart"
+            app:iconPadding="@dimen/sw_10dp"
+            app:layout_constraintTop_toBottomOf="@+id/tvOr" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/sw_20dp"
+            android:text="@string/new_to_logistics_register"
+            android:textSize="@dimen/sw_12sp"
+            android:onClick="@{ (v) -> login.onRegisterClick()}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnGoogle" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</layout>
