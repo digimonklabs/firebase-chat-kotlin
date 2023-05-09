@@ -11,5 +11,7 @@
     <color name="colorGoogleButton">#F1F6F7</color>
     <color name="colorLightGray">#707070</color>
     <color name="colorSearchView">#E7E8EC</color>
-    <color name="colorSeafffrchView">#66FF00</color>
+
+    <color name="colorGreen">#268F00</color>
+    <color name="colorSimpleText">#808080</color>
 </resources>

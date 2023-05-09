@@ -1,6 +1,7 @@
 package com.firebase.chat.ui.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import com.firebase.chat.R
 import com.firebase.chat.base.BaseFragment

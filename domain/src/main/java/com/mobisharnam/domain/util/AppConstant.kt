@@ -4,6 +4,7 @@ object AppConstant {
 
     const val APP_PACKAGE = "app_package"
     const val APP_UID = "app_uid"
+    var isRead = false
 
     // Firebase Database
     const val USER_TABLE = "User"
@@ -13,8 +14,9 @@ object AppConstant {
     const val USER_ONLINE = "online"
     const val MESSAGE_READ = "read"
     const val TOKEN = "token"
+    const val TYPE = "type"
+    const val FRIENDS_LIST = "friendsList"
     var currentUser = ""
-    var currentUserToken = ""
 
     // Firebase auth
     const val ERROR_USER_NOT_FOUND = "ERROR_USER_NOT_FOUND"

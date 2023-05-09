@@ -4,16 +4,12 @@ import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.provider.Settings
-import android.util.Log
 import android.view.View
 import android.widget.SearchView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.core.app.NotificationManagerCompat
 import com.firebase.chat.R
 import com.firebase.chat.base.BaseFragment
 import com.firebase.chat.callback.OnSetAdapter
@@ -31,6 +27,7 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnS
     override val layoutId: Int
         get() = R.layout.fragment_chatting
     override val viewModel: ChatListViewModel by viewModel()
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private val notificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
@@ -50,7 +47,11 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnS
         binding.apply {
             chatFragment = this@Chatting
             viewModel = this@Chatting.viewModel
-            adapter = ChatListAdapter(this@Chatting.viewModel.userList.get()!!,this@Chatting.viewModel.friendUid.get()!!,this@Chatting.viewModel)
+            adapter = ChatListAdapter(
+                this@Chatting.viewModel.userList.get()!!,
+                this@Chatting.viewModel.friendUid.get()!!,
+                this@Chatting.viewModel
+            )
         }
     }
 
@@ -62,6 +63,7 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnS
     override fun onPersistentViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onPersistentViewCreated(view, savedInstanceState)
 
+        AppConstant.isRead = false
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object :
             OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -100,6 +102,6 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnS
 
     override fun onSetAdapter() {
         binding.adapter?.addItem(viewModel.userList.get()!!)
-        binding.adapter?.notifyItemRangeChanged(0,viewModel.userList.get()!!.size-1)
+        binding.adapter?.notifyItemRangeChanged(0, viewModel.userList.get()!!.size - 1)
     }
 }

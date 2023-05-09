@@ -11,9 +11,10 @@ class User(
     val updated: Long,
     val online: Boolean,
     val lastMessage: String,
+    val conversion: ArrayList<String>,
     val friendsList: Map<String,FriendsList> = emptyMap(),
     val token: String
 ) : Parcelable {
 
-    constructor() : this( "","", "", 0,0, false,"",HashMap<String,FriendsList>(),"")
+    constructor() : this( "","", "", 0,0, false,"",ArrayList(),HashMap<String,FriendsList>(),"")
 }

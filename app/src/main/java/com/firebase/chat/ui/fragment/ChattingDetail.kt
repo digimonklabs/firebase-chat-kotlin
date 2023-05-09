@@ -2,14 +2,9 @@ package com.firebase.chat.ui.fragment
 
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.os.Handler
-import android.os.Looper
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.fragment.navArgs
 import com.firebase.chat.R
@@ -30,12 +25,13 @@ class ChattingDetail : BaseFragment<FragmentChatingDetailsBinding, ChatDetailVie
     override val layoutId: Int
         get() = R.layout.fragment_chating_details
     override val viewModel: ChatDetailViewModel by viewModel()
-    private val timer = object : CountDownTimer(3000L,3000L) {
+    private val timer = object : CountDownTimer(3000L, 3000L) {
         override fun onTick(p0: Long) {
 
         }
 
         override fun onFinish() {
+            Log.e("onFinish", "onFinish")
             viewModel.setTyping(false)
         }
     }
@@ -44,17 +40,19 @@ class ChattingDetail : BaseFragment<FragmentChatingDetailsBinding, ChatDetailVie
         binding.apply {
             chatViewModel = viewModel
             chatDetails = this@ChattingDetail
-            adapter = ChatDetailsAdapter(mContext,viewModel.chatModel.get()!!,viewModel)
+            adapter = ChatDetailsAdapter(mContext, viewModel.chatModel.get()!!, viewModel)
         }
     }
 
     override fun onPersistentViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onPersistentViewCreated(view, savedInstanceState)
 
+        AppConstant.isRead = true
+        viewModel.userStatus.set(navArgs.userStatus)
         NotificationManagerCompat.from(mContext).cancel(AppConstant.notificationID)
         receiverId = navArgs.receiverId
-        Log.e("receiverId","receiverId -> $receiverId")
-        viewModel.initChatId(receiverId,this)
+        Log.e("receiverId", "receiverId -> $receiverId")
+        viewModel.initChatId(receiverId, this)
         viewModel.setReceiverName(receiverId)
         handelTyping()
     }
@@ -65,7 +63,7 @@ class ChattingDetail : BaseFragment<FragmentChatingDetailsBinding, ChatDetailVie
             it?.length?.let {
                 if (it <= 0) {
                     viewModel.setTyping(false)
-                }else {
+                } else {
                     viewModel.setTyping(true)
                     timer.start()
                 }
@@ -74,13 +72,16 @@ class ChattingDetail : BaseFragment<FragmentChatingDetailsBinding, ChatDetailVie
     }
 
     fun onSendChat(view: View) {
+        if (viewModel.chatMessage.get().isNullOrEmpty()) {
+            return
+        }
         view.setDelay(2000)
         viewModel.sendMessage(receiverId)
     }
 
     override fun onSetAdapter() {
-        binding.adapter = ChatDetailsAdapter(mContext,viewModel.chatModel.get()!!,viewModel)
-        binding.adapter?.notifyItemRangeChanged(0,viewModel.chatModel.get()!!.size -1)
-        binding.rvChatList.scrollToPosition(viewModel.chatModel.get()!!.size -1)
+        binding.adapter = ChatDetailsAdapter(mContext, viewModel.chatModel.get()!!, viewModel)
+        binding.adapter?.notifyItemRangeChanged(0, viewModel.chatModel.get()!!.size - 1)
+        binding.rvChatList.scrollToPosition(viewModel.chatModel.get()!!.size - 1)
     }
 }

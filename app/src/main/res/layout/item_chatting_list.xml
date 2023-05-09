@@ -7,6 +7,14 @@
         <import type="android.view.View" />
 
         <variable
+            name="isMessagePending"
+            type="Boolean" />
+
+        <variable
+            name="pendingMessageCount"
+            type="String" />
+
+        <variable
             name="viewModel"
             type="com.firebase.chat.ui.viewmodel.ChatListViewModel" />
 
@@ -58,7 +66,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/sw_8dp"
-            android:text="@{viewModel.lastMessage}"
             android:textSize="@dimen/sw_10sp"
             app:layout_constraintBottom_toBottomOf="@+id/ivUserImage"
             app:layout_constraintStart_toEndOf="@+id/ivUserImage"
@@ -69,7 +76,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/sw_4dp"
-            android:text="@{viewModel.lastChatTime}"
             android:textSize="@dimen/sw_10sp"
             app:layout_constraintBottom_toBottomOf="@+id/tvUserName"
             app:layout_constraintEnd_toEndOf="parent"
@@ -83,8 +89,8 @@
             android:layout_marginEnd="@dimen/sw_4dp"
             android:background="@drawable/big_green_dot"
             android:gravity="center"
-            android:visibility="@{viewModel.isMessagePending ? View.VISIBLE : View.GONE}"
-            android:text="@{viewModel.pendingMessageCount}"
+            android:visibility="@{isMessagePending ? View.VISIBLE : View.GONE}"
+            android:text="@{pendingMessageCount}"
             android:textColor="@color/white"
             android:textSize="@dimen/sw_10sp"
             app:layout_constraintBottom_toBottomOf="@+id/tvUserName"

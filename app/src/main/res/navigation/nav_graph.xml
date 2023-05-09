@@ -84,6 +84,10 @@
             android:name="receiverId"
             app:argType="string" />
 
+        <argument
+            android:name="userStatus"
+            app:argType="string" />
+
     </fragment>
 
     <fragment

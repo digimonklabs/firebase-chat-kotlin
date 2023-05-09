@@ -55,6 +55,7 @@ class Register : BaseFragment<FragmentRegisterBinding, RegisterViewModel>() {
                         System.currentTimeMillis(),
                         true,
                         "",
+                        ArrayList(),
                         HashMap(),
                         ""
                     )
