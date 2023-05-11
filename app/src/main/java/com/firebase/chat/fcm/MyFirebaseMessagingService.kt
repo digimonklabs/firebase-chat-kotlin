@@ -26,6 +26,8 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
+        val notificationId = message.data["notificationId"]
+        AppConstant.notificationID = notificationId?.toInt() ?: 0
         Log.e("onMessageReceived","onMessageReceived -> ${message.messageId} ${message.senderId} ${message.notification}")
 
         val intent = Intent(this, MainActivity::class.java)
@@ -52,7 +54,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
                 .setAutoCancel(true)
                 .setChannelId(channelId)
                 .build()
-        AppConstant.notificationID = Random().nextInt()
-        mNotificationManager.notify(AppConstant.notificationID, notification)
+        Log.e("notificationId","fcm -> ${AppConstant.notificationID} $notificationId")
+        mNotificationManager.notify(notificationId?.toInt() ?: 0, notification)
     }
 }

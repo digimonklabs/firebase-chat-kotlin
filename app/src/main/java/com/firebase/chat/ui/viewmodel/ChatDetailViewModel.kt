@@ -1,5 +1,7 @@
 package com.firebase.chat.ui.viewmodel
 
+import android.app.NotificationManager
+import android.content.Context
 import android.util.Log
 import androidx.databinding.ObservableField
 import com.firebase.chat.base.BaseViewModel
@@ -32,7 +34,7 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
         return dateFormat.format(calender.timeInMillis)
     }
 
-    fun sendMessage(receiverId: String) {
+    fun sendMessage(receiverId: String, notificationId: Int) {
         val message = chatMessage.get()
         val references =
             getDataBaseReference().child("/${AppConstant.CHAT_TABLE}/${chatId.get()}")
@@ -62,7 +64,7 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
             header[AppConstant.AUTHORIZATION] = AppConstant.SERVER_KEY
             header[AppConstant.CONTENT_TYPE] = AppConstant.APPLICATION_JSON
             Setting.HEADER = header
-            chatDetailUseCase.getSendNotification(receiverId, message, chatId.get()!!)
+            chatDetailUseCase.getSendNotification(receiverId, message, chatId.get()!!,notificationId)
         }.addOnFailureListener {
             Log.e("chatMessage", "chatMessage fail to send")
         }
@@ -128,7 +130,7 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
                 if (snapshot.childrenCount == 0L) {
                     chatId.set(senderChatId)
                     getUserChat(onSetAdapter)
-                    setMarkAsRead()
+                    setMarkAsRead(receiverId)
                 } else {
                     for (ds in snapshot.children) {
                         Log.e(
@@ -139,24 +141,24 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
                             if (ds.key!! == senderChatId) {
                                 chatId.set(senderChatId)
                                 getUserChat(onSetAdapter)
-                                setMarkAsRead()
+                                setMarkAsRead(receiverId)
                             } else if (ds.key!! == receiverChatId) {
                                 chatId.set(receiverChatId)
                                 getUserChat(onSetAdapter)
-                                setMarkAsRead()
+                                setMarkAsRead(receiverId)
                             }
                         } else {
                             if (snapshot.children.last() == ds.children) {
                                 chatId.set(senderChatId)
                                 getUserChat(onSetAdapter)
-                                setMarkAsRead()
+                                setMarkAsRead(receiverId)
                             }
                         }
                     }
                     if (chatId.get().isNullOrEmpty()) {
                         chatId.set(senderChatId)
                         getUserChat(onSetAdapter)
-                        setMarkAsRead()
+                        setMarkAsRead(receiverId)
                     }
                 }
                 Log.e("GetChatID", "chatId -> ${chatId.get()}")
@@ -168,7 +170,8 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
         })
     }
 
-    fun setMarkAsRead() {
+    fun setMarkAsRead(receiverId: String) {
+        clearNotification(receiverId)
         val chatReference =
             getDataBaseReference().child(AppConstant.CHAT_TABLE).child(chatId.get()!!)
         chatReference.addValueEventListener(object : ValueEventListener {
@@ -201,5 +204,25 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
         Log.e("chatId", "chatId -> ${chatId.get()}")
         getDataBaseReference().child("/${AppConstant.TYPING_TABLE}/${chatId.get()}")
             .child(AppConstant.TYPE).setValue(isTyping)
+    }
+
+    fun sendNotificationID(notificationId: Int, receiverId: String) {
+        getDataBaseReference().child(AppConstant.NOTIFICATION_TABLE).child("${receiverId}_${getFireBaseAuth().uid}").setValue(notificationId)
+    }
+
+    fun clearNotification(receiverId: String) {
+        val notificationReference = getDataBaseReference().child(AppConstant.NOTIFICATION_TABLE)
+        notificationReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val notificationManager = chatDetailUseCase.getContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                snapshot.child("${getFireBaseAuth().uid}_$receiverId").getValue<Int>()?.let {
+                    notificationManager.cancel(it)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
     }
 }

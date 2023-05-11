@@ -5,6 +5,7 @@ import com.daily.quotes.base.BaseViewHolder
 import com.firebase.chat.R
 import com.firebase.chat.databinding.ItemAddFriendsBinding
 import com.firebase.chat.ui.viewmodel.ChatListViewModel
+import com.mobisharnam.domain.model.firebasedb.UidList
 import com.mobisharnam.domain.model.firebasedb.User
 import java.util.Locale
 import org.json.JSONException
@@ -12,7 +13,7 @@ import org.json.JSONException
 class AddFriendsAdapter(
     private val userModel: ArrayList<User>,
     viewModel: ChatListViewModel,
-    private val uid: ArrayList<String>
+    private val uid: ArrayList<UidList>
 ) : BaseAdapters<ItemAddFriendsBinding, ChatListViewModel, User>(userModel, viewModel) {
 
     private val allUserList: java.util.ArrayList<User> =

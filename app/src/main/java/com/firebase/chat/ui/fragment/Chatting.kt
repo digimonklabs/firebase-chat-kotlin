@@ -31,7 +31,9 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnS
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private val notificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-            if (!it && shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+            if (!it) {
+//                launchNotificationPermission()
+            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
                 launchNotificationPermission()
             } else {
                 val intent = Intent()
@@ -47,11 +49,6 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnS
         binding.apply {
             chatFragment = this@Chatting
             viewModel = this@Chatting.viewModel
-            adapter = ChatListAdapter(
-                this@Chatting.viewModel.userList.get()!!,
-                this@Chatting.viewModel.friendUid.get()!!,
-                this@Chatting.viewModel
-            )
         }
     }
 
@@ -101,7 +98,11 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnS
     }
 
     override fun onSetAdapter() {
+        binding.adapter = ChatListAdapter(
+            this@Chatting.viewModel.userList.get()!!,
+            this@Chatting.viewModel.friendUid.get()!!,
+            this@Chatting.viewModel
+        )
         binding.adapter?.addItem(viewModel.userList.get()!!)
-        binding.adapter?.notifyItemRangeChanged(0, viewModel.userList.get()!!.size - 1)
     }
 }

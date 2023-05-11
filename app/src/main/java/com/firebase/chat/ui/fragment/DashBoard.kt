@@ -1,19 +1,15 @@
 package com.firebase.chat.ui.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import com.firebase.chat.R
 import com.firebase.chat.base.BaseFragment
 import com.firebase.chat.base.BaseViewModel
 import com.firebase.chat.databinding.FragmentDashBoardBinding
-import com.mobisharnam.domain.util.AppConstant
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.mobisharnam.domain.model.firebasedb.FriendsList
-import com.mobisharnam.domain.model.firebasedb.User
+import com.mobisharnam.domain.util.AppConstant
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class DashBoard : BaseFragment<FragmentDashBoardBinding, BaseViewModel>() {
@@ -30,8 +26,8 @@ class DashBoard : BaseFragment<FragmentDashBoardBinding, BaseViewModel>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        Firebase.database.setPersistenceEnabled(true)
-//        Firebase.database.setPersistenceCacheSizeBytes(100 * 1000 * 1000)
+        Firebase.database.setPersistenceEnabled(true)
+        Firebase.database.setPersistenceCacheSizeBytes(100 * 1000 * 1000)
 
        /* viewModel.getDataBaseReference().child(AppConstant.USER_TABLE).child(
             "8fCP4TXjEbXC7nD3K62XwiWXMXq1").child("friendsList").child(viewModel.getFireBaseAuth().uid.toString()).setValue(friends)*/

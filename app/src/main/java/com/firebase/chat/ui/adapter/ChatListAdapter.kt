@@ -9,12 +9,14 @@ import com.firebase.chat.R
 import com.firebase.chat.databinding.ItemChattingListBinding
 import com.firebase.chat.ui.fragment.ChattingDirections
 import com.firebase.chat.ui.viewmodel.ChatListViewModel
+import com.firebase.chat.utils.Extension.toast
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.getValue
 import com.mobisharnam.domain.model.firebasedb.ChatModel
 import com.mobisharnam.domain.model.firebasedb.TypingModel
+import com.mobisharnam.domain.model.firebasedb.UidList
 import com.mobisharnam.domain.model.firebasedb.User
 import com.mobisharnam.domain.util.AppConstant
 import java.util.Calendar
@@ -23,7 +25,7 @@ import org.json.JSONException
 
 class ChatListAdapter(
     private val chatModel: ArrayList<User>,
-    private val uid: ArrayList<String>,
+    private val uid: ArrayList<UidList>,
     viewModel: ChatListViewModel
 ) : BaseAdapters<ItemChattingListBinding, ChatListViewModel, User>(chatModel, viewModel) {
 
@@ -52,6 +54,7 @@ class ChatListAdapter(
         holder: BaseViewHolder<ItemChattingListBinding>,
         viewModel: ChatListViewModel
     ) {
+        Log.e("PrintDateImeFF","in adapter is -> ${item.uid}")
         binding.apply {
             mBinding = this
             this.viewModel = viewModel
@@ -60,6 +63,12 @@ class ChatListAdapter(
                 onlineDot.context,
                 R.drawable.green_dot
             ) else ContextCompat.getDrawable(onlineDot.context, R.drawable.yellow_dot)
+            try {
+                val name = item.userName.split(" ")
+                ivUserImage.text = name[0][0] + name[1][0].toString()
+            } catch (e: Exception) {
+                ivUserImage.text = item.userName[0].toString()
+            }
         }
         var chatId = ""
         val senderChatId = "${viewModel.getFireBaseAuth().uid}_${item.uid}"
@@ -168,7 +177,8 @@ class ChatListAdapter(
             viewModel.navigate(
                 ChattingDirections.chattingToChattingDetailFragment(
                     item.uid,
-                    status
+                    status,
+                    item.notificationId
                 )
             )
         }

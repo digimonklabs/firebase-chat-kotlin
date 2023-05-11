@@ -1,5 +1,7 @@
 package com.firebase.chat.ui.fragment
 
+import android.app.NotificationManager
+import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
@@ -49,9 +51,9 @@ class ChattingDetail : BaseFragment<FragmentChatingDetailsBinding, ChatDetailVie
 
         AppConstant.isRead = true
         viewModel.userStatus.set(navArgs.userStatus)
-        NotificationManagerCompat.from(mContext).cancel(AppConstant.notificationID)
+        viewModel.clearNotification(navArgs.receiverId)
         receiverId = navArgs.receiverId
-        Log.e("receiverId", "receiverId -> $receiverId")
+        Log.e("receiverId", "receiverId -> $receiverId   ")
         viewModel.initChatId(receiverId, this)
         viewModel.setReceiverName(receiverId)
         handelTyping()
@@ -76,7 +78,8 @@ class ChattingDetail : BaseFragment<FragmentChatingDetailsBinding, ChatDetailVie
             return
         }
         view.setDelay(2000)
-        viewModel.sendMessage(receiverId)
+        viewModel.sendNotificationID(navArgs.notificationId,receiverId)
+        viewModel.sendMessage(receiverId,navArgs.notificationId)
     }
 
     override fun onSetAdapter() {

@@ -1,6 +1,7 @@
 package com.mobisharnam.domain.interacter
 
 import android.content.Context
+import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -19,12 +20,17 @@ class ChatDetailUseCase(
     private val localRepository: LocalRepository
 ): BaseUseCase(context,remoteRepository,localRepository) {
 
-    suspend fun sendNotification(send: String, jsonObject: JSONObject) {
-        val response = remoteRepository.post(NotificationResponse::class.java,send,jsonObject.toString())
-        AppConstant.notificationID = response.data?.multicast_id?.toInt()  ?: 0
+    suspend fun sendNotification(send: String, jsonObject: JSONObject, notificationId: Int) {
+        Log.e("notificationId","notificationId -> $notificationId")
+        remoteRepository.post(NotificationResponse::class.java,send,jsonObject.toString())
     }
 
-    fun getSendNotification(receiverId: String, message: String?,chatId: String) {
+    fun getSendNotification(
+        receiverId: String,
+        message: String?,
+        chatId: String,
+        notificationId: Int
+    ) {
         val reference = getDataBaseReference().child("User").child(receiverId).child("token")
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -38,8 +44,12 @@ class ChatDetailUseCase(
                         notificationObject.put(AppConstant.CHAT_ID,chatId)
                         notificationObject.put(AppConstant.RECEIVER_ID,receiverId)
                         notificationObject.put(AppConstant.SERVER_KEY,receiverId)
+                        notificationObject.put(AppConstant.NOTIFICATION_ID,notificationId)
+                        val dataObject = JSONObject()
+                        dataObject.put("notificationId", notificationId)
                         jsonObject.put(AppConstant.NOTIFICATION,notificationObject)
-                        sendNotification(AppConstant.SEND,jsonObject)
+                        jsonObject.put("data", dataObject)
+                        sendNotification(AppConstant.SEND,jsonObject,notificationId)
                     }
                 }
             }

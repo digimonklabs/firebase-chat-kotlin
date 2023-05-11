@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavDirections
-import com.daily.quotes.navigation.NavigationCommand
+import com.firebase.chat.navigation.NavigationCommand
 import com.mobisharnam.domain.util.AppConstant
 import com.firebase.chat.utils.Event
 import com.google.firebase.auth.FirebaseAuth

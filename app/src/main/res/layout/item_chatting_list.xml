@@ -28,13 +28,16 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/sw_10dp">
 
-        <com.google.android.material.imageview.ShapeableImageView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/ivUserImage"
             android:layout_width="@dimen/sw_40dp"
             android:layout_height="@dimen/sw_40dp"
             android:layout_marginStart="@dimen/sw_4dp"
-            android:background="@color/colorLightGray"
-            android:src="@drawable/ic_user"
+            android:layout_marginEnd="@dimen/sw_4dp"
+            android:background="@drawable/bg_rounded_user_image"
+            app:contentPadding="@dimen/sw_8dp"
+            android:gravity="center"
+            android:textSize="@dimen/sw_16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

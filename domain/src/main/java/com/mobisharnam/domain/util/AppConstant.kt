@@ -10,6 +10,7 @@ object AppConstant {
     const val USER_TABLE = "User"
     const val CHAT_TABLE = "Chat"
     const val TYPING_TABLE = "Typing"
+    const val NOTIFICATION_TABLE = "NotificationTable"
     const val USER_FRIEND_LIST = "friendsList"
     const val USER_ONLINE = "online"
     const val MESSAGE_READ = "read"
@@ -34,5 +35,6 @@ object AppConstant {
     const val CONTENT_TYPE = "Content-Type"
     const val APPLICATION_JSON = "application/json"
     const val AUTHORIZATION = "Authorization"
+    const val NOTIFICATION_ID = "notificationId"
     const val SERVER_KEY = "key=AAAA63pJUSA:APA91bGB95AcEe6hLN4Op3y3lTSc96_M31UKxFYz7Enn0WJEXrOah5CTr-Cf2xuhSWEWuV9lawS-2EmZdsOVsvOb4YSnT5ttJUh40rXc077JX-82cpoWUVOuiQA9KI7BIOrAUqif2pmo"
 }

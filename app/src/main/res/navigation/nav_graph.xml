@@ -88,6 +88,10 @@
             android:name="userStatus"
             app:argType="string" />
 
+        <argument
+            android:name="notificationId"
+            app:argType="integer"/>
+
     </fragment>
 
     <fragment

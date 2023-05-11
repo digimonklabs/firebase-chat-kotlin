@@ -1,4 +1,4 @@
-package com.daily.quotes.navigation
+package com.firebase.chat.navigation
 
 import androidx.navigation.NavDirections
 

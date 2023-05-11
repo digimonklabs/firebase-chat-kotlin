@@ -10,7 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.daily.quotes.navigation.NavigationCommand
+import com.firebase.chat.navigation.NavigationCommand
 
 abstract class BaseFragment<BINDING : ViewDataBinding, VM : BaseViewModel> : Fragment() {
 
