@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.widget.SearchView
 import androidx.activity.OnBackPressedCallback
@@ -18,6 +19,7 @@ import com.firebase.chat.ui.adapter.ChatListAdapter
 import com.firebase.chat.ui.viewmodel.ChatListViewModel
 import com.firebase.chat.utils.Extension.checkIsTiramisu
 import com.firebase.chat.utils.Extension.checkPermission
+import com.firebase.chat.utils.Extension.toast
 import com.mobisharnam.domain.util.AppConstant
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -49,6 +51,11 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnS
         binding.apply {
             chatFragment = this@Chatting
             viewModel = this@Chatting.viewModel
+           /* adapter = ChatListAdapter(
+                this@Chatting.viewModel.userList.get()!!,
+                this@Chatting.viewModel.chatList.get()!!,
+                this@Chatting.viewModel
+            )*/
         }
     }
 
@@ -57,10 +64,16 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnS
         notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.getAllUser()
+    }
+
     override fun onPersistentViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onPersistentViewCreated(view, savedInstanceState)
 
         AppConstant.isRead = false
+        viewModel.initUserChat(this)
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object :
             OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -73,8 +86,6 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnS
                 launchNotificationPermission()
             }
         }
-
-        viewModel.init(this)
 
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
@@ -97,12 +108,18 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnS
         viewModel.navigate(ChattingDirections.addUserToChattingFragment())
     }
 
-    override fun onSetAdapter() {
-        binding.adapter = ChatListAdapter(
-            this@Chatting.viewModel.userList.get()!!,
-            this@Chatting.viewModel.friendUid.get()!!,
-            this@Chatting.viewModel
-        )
-        binding.adapter?.addItem(viewModel.userList.get()!!)
+    override fun onSetAdapter(adapter: String) {
+        if (adapter == AppConstant.CHAT_ADAPTER) {
+            viewModel.chatList.get()?.sortByDescending {
+                it.dateTime
+            }
+            Log.e("HOwmannyCall","onSetAdapter")
+//            binding.adapter?.addItem(viewModel.userList.get()!!)
+            binding.adapter = ChatListAdapter(
+                this@Chatting.viewModel.userList.get()!!,
+                this@Chatting.viewModel.chatList.get()!!,
+                this@Chatting.viewModel
+            )
+        }
     }
 }

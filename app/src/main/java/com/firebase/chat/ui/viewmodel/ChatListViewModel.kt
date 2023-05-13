@@ -1,7 +1,8 @@
 package com.firebase.chat.ui.viewmodel
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
-import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import com.firebase.chat.base.BaseViewModel
 import com.firebase.chat.callback.OnSetAdapter
@@ -9,82 +10,62 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.mobisharnam.domain.interacter.ChatListUseCase
-import com.mobisharnam.domain.model.firebasedb.ChatModel
 import com.mobisharnam.domain.model.firebasedb.FriendsList
+import com.mobisharnam.domain.model.firebasedb.NewChatModel
+import com.mobisharnam.domain.model.firebasedb.NewUser
 import com.mobisharnam.domain.model.firebasedb.UidList
 import com.mobisharnam.domain.model.firebasedb.User
 import com.mobisharnam.domain.util.AppConstant
-import java.util.Collections
 
 class ChatListViewModel(private val chatListUseCase: ChatListUseCase) :
     BaseViewModel(chatListUseCase) {
 
-    val noFriend = ObservableBoolean(false)
+    val chatList = ObservableField(ArrayList<NewChatModel>())
+//    val noFriend = ObservableBoolean(false)
     var userList = ObservableField(ArrayList<User>())
     var friendList = ObservableField(ArrayList<String>())
+    var addFriend = ObservableField(HashMap<String,FriendsList>())
     var friendUid = ObservableField(ArrayList<UidList>())
 
-    fun init(onSetAdapter: OnSetAdapter) {
-        val postListener = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if (dataSnapshot.exists() && dataSnapshot.hasChildren()) {
-                    userList.get()?.clear()
-                    friendUid.get()?.clear()
-                    friendList.get()?.clear()
-                    for (sp in dataSnapshot.children) {
-                        val user = sp.getValue(User::class.java)
-                        user?.let {
-                            if (sp.key == getFireBaseAuth().uid) {
-                                it.friendsList.forEach {
-                                    val uidList = UidList(it.key,it.value.dateTime)
-                                    friendUid.get()?.add(uidList)
+    fun initUserChat(onSetAdapter: OnSetAdapter) {
+        val chatReference = getDataBaseReference().child(AppConstant.CHAT_TABLE)
+        chatReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+               val chat = ArrayList<NewChatModel>()
+                for (ds in snapshot.children) {
+                    if (ds.key!!.contains(getFireBaseAuth().uid.toString())) {
+                        chatReference.child(ds.key.toString()).orderByKey().limitToLast(1).addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                for (sp in snapshot.children) {
+                                    sp.getValue(NewChatModel::class.java)?.let {
+                                        chat.add(it)
+                                    }
                                 }
-
-                                it.friendsList.keys.forEach {
-                                    friendList.get()?.add(it)
-                                }
-                            } else {
-                                userList.get()?.add(it)
+                                chatList.set(ArrayList())
+                                chatList.set(chat)
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    onSetAdapter.onSetAdapter(AppConstant.CHAT_ADAPTER)
+                                },500)
                             }
-                        }
-                    }
-                    val user: ArrayList<User> = userList.get()!!
 
-                    friendUid.get()?.sortByDescending  {
-                        it.dateTime
-                    }
+                            override fun onCancelled(error: DatabaseError) {
 
-                    friendUid.get()?.forEach {
-                        Log.e("PrintFriendUid","PrintFriendUid -> ${it.uid} -- ${it.dateTime}")
-                    }
-                    Log.e("PrintFriendUid","PrintFriendUid -> ------------------------")
-
-                    userList.set(ArrayList())
-
-                    Log.e("PrintUIdArray","user -> ${user?.size}  friend -> ${friendUid.get()?.size}")
-                    for (i in 0 until friendUid.get()!!.size) {
-
-                        for (j in 0 until user!!.size) {
-
-                            if (user[j].uid == friendUid.get()!![i].uid) {
-                                Log.e("PrintUIdArray","user -> ${user[j].uid}  friend -> ${friendUid.get()!![i].uid}")
-                                userList.get()?.add(user[j])
                             }
-                        }
+                        })
                     }
-
-
-
-                    friendUid.get()?.isEmpty()?.let { noFriend.set(it) }
-                    onSetAdapter.onSetAdapter()
                 }
             }
 
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.e("postListener", "loadPost:onCancelled", databaseError.toException())
+            override fun onCancelled(error: DatabaseError) {
+
             }
+        })
+    }
+
+    fun sendInvitation() {
+        existFriendList.get()?.forEach { friendUid ->
+            val invitationId = "${getFireBaseAuth().uid}_${friendUid}"
+            getDataBaseReference().child("Invitations").child(invitationId).setValue(true)
         }
-        val userRef = getDataBaseReference().child(AppConstant.USER_TABLE)
-        userRef.addListenerForSingleValueEvent(postListener)
     }
 }

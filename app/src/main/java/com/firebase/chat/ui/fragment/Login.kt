@@ -42,6 +42,13 @@ class Login : BaseFragment<FragmentLoginBinding, LoginViewModel>() {
                 mContext.toast(getString(R.string.login_successfully))
                 task.result.user?.uid?.let {
                     viewModel.setToken(it)
+                    viewModel.currentUserName(it)
+                    viewModel.setToken(it)
+                    viewModel.getDataBaseReference().child(AppConstant.USER_TABLE).child(it).child(
+                        AppConstant.USER_ONLINE).ref.setValue(true)
+                    viewModel.getDataBaseReference().child(AppConstant.USER_TABLE).child(it).child(
+                        AppConstant.USER_ONLINE).ref.onDisconnect().setValue(false)
+
                 }
                 viewModel.navigate(LoginDirections.loginToChattingFragment())
             }else {

@@ -2,6 +2,12 @@ package com.mobisharnam.domain.util
 
 object AppConstant {
 
+    // Adapter name
+    const val INVITATION_ADAPTER = "invitationAdapter"
+    const val ADD_FRIENDS_ADAPTER = "addFriendsAdapter"
+    const val CHAT_ADAPTER = "chatAdapter"
+    const val CHAT_DETAILS_ADAPTER_ADAPTER = "chatDetailsAdapter"
+
     const val APP_PACKAGE = "app_package"
     const val APP_UID = "app_uid"
     var isRead = false
@@ -11,12 +17,13 @@ object AppConstant {
     const val CHAT_TABLE = "Chat"
     const val TYPING_TABLE = "Typing"
     const val NOTIFICATION_TABLE = "NotificationTable"
-    const val USER_FRIEND_LIST = "friendsList"
     const val USER_ONLINE = "online"
     const val MESSAGE_READ = "read"
     const val TOKEN = "token"
     const val TYPE = "type"
     const val FRIENDS_LIST = "friendsList"
+    const val RECEIVER_TYPING = "receiverTyping"
+    const val SENDER_TYPING = "senderTyping"
     var currentUser = ""
 
     // Firebase auth
@@ -26,6 +33,7 @@ object AppConstant {
     var notificationID = 0
     const val SEND = "send"
     const val TO = "to"
+    const val DATA = "data"
     const val TITLE = "title"
     const val BODY = "body"
     const val SENDER_ID = "senderId"

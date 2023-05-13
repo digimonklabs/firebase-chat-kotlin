@@ -1,12 +1,14 @@
 package com.firebase.chat.ui.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import com.firebase.chat.R
 import com.firebase.chat.base.BaseFragment
 import com.firebase.chat.base.BaseViewModel
 import com.firebase.chat.databinding.FragmentDashBoardBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.mobisharnam.domain.util.AppConstant
@@ -28,6 +30,11 @@ class DashBoard : BaseFragment<FragmentDashBoardBinding, BaseViewModel>() {
 
         Firebase.database.setPersistenceEnabled(true)
         Firebase.database.setPersistenceCacheSizeBytes(100 * 1000 * 1000)
+        FirebaseDatabase.getInstance().getReference(AppConstant.USER_TABLE).keepSynced(true)
+        FirebaseDatabase.getInstance().getReference(AppConstant.CHAT_TABLE).keepSynced(true)
+        FirebaseDatabase.getInstance().getReference(AppConstant.TYPING_TABLE).keepSynced(true)
+        FirebaseDatabase.getInstance().getReference(AppConstant.NOTIFICATION_TABLE).keepSynced(true)
+
 
        /* viewModel.getDataBaseReference().child(AppConstant.USER_TABLE).child(
             "8fCP4TXjEbXC7nD3K62XwiWXMXq1").child("friendsList").child(viewModel.getFireBaseAuth().uid.toString()).setValue(friends)*/

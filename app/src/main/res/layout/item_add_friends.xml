@@ -5,11 +5,12 @@
     <data>
         <variable
             name="userModel"
-            type="com.mobisharnam.domain.model.firebasedb.User" />
+            type="com.mobisharnam.domain.model.firebasedb.NewUser" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        android:layout_marginBottom="@dimen/sw_8dp"
         android:layout_height="wrap_content">
 
         <com.google.android.material.imageview.ShapeableImageView

@@ -4,6 +4,7 @@ import com.firebase.chat.base.BaseViewModel
 import com.firebase.chat.ui.viewmodel.ChatDetailViewModel
 import com.firebase.chat.ui.viewmodel.ChatListViewModel
 import com.firebase.chat.ui.viewmodel.ForgotPasswordViewModel
+import com.firebase.chat.ui.viewmodel.InvitationViewModel
 import com.firebase.chat.ui.viewmodel.LoginViewModel
 import com.firebase.chat.ui.viewmodel.RegisterViewModel
 import com.mobisharnam.data.repository.LocalRepositoryImpl
@@ -13,6 +14,7 @@ import com.mobisharnam.domain.interacter.BaseUseCase
 import com.mobisharnam.domain.interacter.ChatDetailUseCase
 import com.mobisharnam.domain.interacter.ChatListUseCase
 import com.mobisharnam.domain.interacter.ForgotPasswordUseCase
+import com.mobisharnam.domain.interacter.InvitationUseCase
 import com.mobisharnam.domain.interacter.LoginUseCase
 import com.mobisharnam.domain.interacter.RegisterUseCase
 import com.mobisharnam.domain.repository.LocalRepository
@@ -27,6 +29,7 @@ val viewModelModule = module {
     viewModel { ForgotPasswordViewModel(get()) }
     viewModel { ChatListViewModel(get()) }
     viewModel { ChatDetailViewModel(get()) }
+    viewModel { InvitationViewModel(get()) }
 }
 val useCaseModule = module {
     factory { BaseUseCase(get(), get(), get()) }
@@ -35,6 +38,7 @@ val useCaseModule = module {
     factory { ForgotPasswordUseCase(get(), get(), get()) }
     factory { ChatListUseCase(get(), get(), get()) }
     factory { ChatDetailUseCase(get(), get(), get()) }
+    factory { InvitationUseCase(get(), get(), get()) }
 }
 val repositoryModule = module {
     factory<RemoteRepository> { RemoteRepositoryImpl(get()) }

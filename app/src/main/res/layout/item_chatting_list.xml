@@ -20,7 +20,7 @@
 
         <variable
             name="userModel"
-            type="com.mobisharnam.domain.model.firebasedb.User" />
+            type="com.mobisharnam.domain.model.firebasedb.NewChatModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -56,7 +56,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/sw_8dp"
-            android:text="@{userModel.userName}"
             android:textSize="@dimen/sw_14sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/tvLastMessage"
@@ -66,10 +65,14 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvLastMessage"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/sw_0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/sw_8dp"
             android:textSize="@dimen/sw_10sp"
+            android:layout_marginEnd="@dimen/sw_6dp"
+            android:singleLine="true"
+            android:ellipsize="end"
+            app:layout_constraintEnd_toStartOf="@+id/tvCount"
             app:layout_constraintBottom_toBottomOf="@+id/ivUserImage"
             app:layout_constraintStart_toEndOf="@+id/ivUserImage"
             app:layout_constraintTop_toBottomOf="@+id/tvUserName" />

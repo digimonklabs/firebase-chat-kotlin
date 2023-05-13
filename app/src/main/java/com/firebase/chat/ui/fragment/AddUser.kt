@@ -1,6 +1,7 @@
 package com.firebase.chat.ui.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.SearchView
 import com.firebase.chat.R
@@ -25,14 +26,19 @@ class AddUser : BaseFragment<FragmentAddUserBinding, ChatListViewModel>(), OnSet
         binding.apply {
             viewModel = this@AddUser.viewModel
             addUser = this@AddUser
-            adapter = AddFriendsAdapter(this@AddUser.viewModel.userList.get()!!,this@AddUser.viewModel,this@AddUser.viewModel.friendUid.get()!!)
+            adapter = AddFriendsAdapter(this@AddUser.viewModel.userChatList.get()!!,this@AddUser.viewModel,this@AddUser.viewModel.existFriendList.get()!!)
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.getAllUser(this)
     }
 
     override fun onPersistentViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onPersistentViewCreated(view, savedInstanceState)
 
-        viewModel.init(this)
+       // viewModel.init(this)
 
         binding.searchFriend.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
@@ -52,16 +58,13 @@ class AddUser : BaseFragment<FragmentAddUserBinding, ChatListViewModel>(), OnSet
     }
 
     fun onAddClick() {
-        val rootReferences = viewModel.getDataBaseReference()
-        rootReferences.child(AppConstant.USER_TABLE).child(Firebase.auth.uid.toString()).child(
-            AppConstant.USER_FRIEND_LIST).setValue(viewModel.friendList.get())
-        viewModel.friendList.get()?.forEach {
-//            rootReferences.child(AppConstant.USER_TABLE).child(it).child(AppConstant.USER_FRIEND_LIST).setValue(Firebase.auth.uid.toString())
-        }
+        viewModel.sendInvitation()
     }
 
-    override fun onSetAdapter() {
-        binding.adapter?.addItem(viewModel.userList.get()!!)
-        binding.adapter?.notifyDataSetChanged()
+    override fun onSetAdapter(adapter: String) {
+        if (adapter == AppConstant.ADD_FRIENDS_ADAPTER) {
+            binding.adapter?.addItem(viewModel.userChatList.get()!!)
+            binding.adapter?.notifyDataSetChanged()
+        }
     }
 }

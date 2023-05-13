@@ -5,26 +5,28 @@ import com.daily.quotes.base.BaseViewHolder
 import com.firebase.chat.R
 import com.firebase.chat.databinding.ItemAddFriendsBinding
 import com.firebase.chat.ui.viewmodel.ChatListViewModel
+import com.mobisharnam.domain.model.firebasedb.FriendsList
+import com.mobisharnam.domain.model.firebasedb.NewUser
 import com.mobisharnam.domain.model.firebasedb.UidList
 import com.mobisharnam.domain.model.firebasedb.User
 import java.util.Locale
 import org.json.JSONException
 
 class AddFriendsAdapter(
-    private val userModel: ArrayList<User>,
+    private val userModel: ArrayList<NewUser>,
     viewModel: ChatListViewModel,
-    private val uid: ArrayList<UidList>
-) : BaseAdapters<ItemAddFriendsBinding, ChatListViewModel, User>(userModel, viewModel) {
+    private val uid: ArrayList<String>
+) : BaseAdapters<ItemAddFriendsBinding, ChatListViewModel, NewUser>(userModel, viewModel) {
 
-    private val allUserList: java.util.ArrayList<User> =
-        java.util.ArrayList<User>()
-    private val filterUserList: java.util.ArrayList<User> =
-        java.util.ArrayList<User>()
+    private val allUserList: java.util.ArrayList<NewUser> =
+        java.util.ArrayList<NewUser>()
+    private val filterUserList: java.util.ArrayList<NewUser> =
+        java.util.ArrayList<NewUser>()
 
     override val layoutId: Int
         get() = R.layout.item_add_friends
 
-    fun addItem(item: ArrayList<User>) {
+    fun addItem(item: ArrayList<NewUser>) {
         this.allUserList.addAll(item)
         this.filterUserList.addAll(item)
         notifyDataSetChanged()
@@ -32,7 +34,7 @@ class AddFriendsAdapter(
 
     override fun bind(
         binding: ItemAddFriendsBinding,
-        item: User,
+        item: NewUser,
         position: Int,
         holder: BaseViewHolder<ItemAddFriendsBinding>,
         viewModel: ChatListViewModel
@@ -46,11 +48,11 @@ class AddFriendsAdapter(
         binding.checkUser.setOnCheckedChangeListener { compoundButton, isCheck ->
             when (isCheck) {
                 true -> {
-//                    viewModel.friendList.get()?.add(uid)
+                    viewModel.existFriendList.get()?.add(userModel[position].uid)
                 }
 
                 false -> {
-//                    viewModel.friendList.get()?.remove(uid[position])
+                    viewModel.existFriendList.get()?.remove(userModel[position].uid)
                 }
             }
         }

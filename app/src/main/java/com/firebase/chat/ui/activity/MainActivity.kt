@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             }
             R.id.menu_invitation -> {
-
+                navController.navigate(R.id.invitationFragment)
             }
             R.id.menu_add_friend -> {
                 navController.navigate(R.id.addUserFragment)

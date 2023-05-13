@@ -89,12 +89,12 @@
             android:id="@+id/rvChatList"
             android:layout_width="match_parent"
             android:layout_height="@dimen/sw_0dp"
-            android:layout_marginVertical="@dimen/sw_10dp"
+            android:layout_marginBottom="@dimen/sw_10dp"
             android:adapter="@{adapter}"
             android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/cvMessage"
-            app:layout_constraintTop_toBottomOf="@+id/ivBack"
+            app:layout_constraintTop_toBottomOf="@+id/header"
             app:stackFromEnd="true" />
 
         <androidx.cardview.widget.CardView

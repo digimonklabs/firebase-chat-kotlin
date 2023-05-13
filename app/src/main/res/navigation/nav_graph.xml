@@ -100,4 +100,11 @@
         android:id="@+id/addUserFragment">
 
     </fragment>
+
+    <fragment
+        android:id="@+id/invitationFragment"
+        android:name="com.firebase.chat.ui.fragment.Invitation"
+        tools:layout="@layout/fragment_invitation">
+
+    </fragment>
 </navigation>

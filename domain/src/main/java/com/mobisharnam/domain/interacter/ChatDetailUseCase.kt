@@ -31,7 +31,7 @@ class ChatDetailUseCase(
         chatId: String,
         notificationId: Int
     ) {
-        val reference = getDataBaseReference().child("User").child(receiverId).child("token")
+        val reference = getDataBaseReference().child(AppConstant.USER_TABLE).child(receiverId).child(AppConstant.TOKEN)
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 snapshot.getValue(String::class.java)?.let {
@@ -46,9 +46,9 @@ class ChatDetailUseCase(
                         notificationObject.put(AppConstant.SERVER_KEY,receiverId)
                         notificationObject.put(AppConstant.NOTIFICATION_ID,notificationId)
                         val dataObject = JSONObject()
-                        dataObject.put("notificationId", notificationId)
+                        dataObject.put(AppConstant.NOTIFICATION_ID, notificationId)
                         jsonObject.put(AppConstant.NOTIFICATION,notificationObject)
-                        jsonObject.put("data", dataObject)
+                        jsonObject.put(AppConstant.DATA, dataObject)
                         sendNotification(AppConstant.SEND,jsonObject,notificationId)
                     }
                 }

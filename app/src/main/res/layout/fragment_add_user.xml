@@ -23,16 +23,24 @@
         android:layout_height="match_parent"
         tools:context=".ui.fragment.AddUser">
 
+        <View
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="?android:actionBarSize"
+            android:background="@color/colorPrimary"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/sw_10sp"
-            android:layout_marginTop="@dimen/sw_14dp"
+            android:tint="@color/white"
             android:onClick="@{ () -> viewModel.navigateBack()}"
             android:src="@drawable/ic_back_arrow"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintBottom_toBottomOf="@+id/header"
+            app:layout_constraintStart_toStartOf="@+id/header"
+            app:layout_constraintTop_toTopOf="@+id/header" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="@dimen/sw_0dp"
@@ -41,6 +49,9 @@
             android:text="@string/add_friends"
             android:textSize="@dimen/sw_18sp"
             android:textStyle="bold"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="@+id/ivBack"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/ivBack"
@@ -58,7 +69,7 @@
             android:theme="@style/MySearchViewStyle"
             android:layout_marginHorizontal="@dimen/sw_20dp"
             android:layout_width="match_parent"
-            app:layout_constraintTop_toBottomOf="@+id/ivBack"
+            app:layout_constraintTop_toBottomOf="@+id/header"
             android:layout_height="@dimen/sw_40dp" />
 
         <androidx.recyclerview.widget.RecyclerView

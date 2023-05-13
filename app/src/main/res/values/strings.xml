@@ -39,4 +39,6 @@
     <string name="yesterday">Yesterday</string>
     <string name="online">Online</string>
     <string name="alert_typing">Typing...</string>
+    <string name="accept">Accept</string>
+    <string name="denied">Denied</string>
 </resources>
