@@ -1,5 +1,6 @@
 package com.firebase.chat.ui.viewmodel
 
+import android.media.VolumeAutomation
 import android.util.Log
 import androidx.databinding.ObservableField
 import com.firebase.chat.base.BaseViewModel
@@ -9,6 +10,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.getValue
 import com.mobisharnam.domain.interacter.InvitationUseCase
+import com.mobisharnam.domain.model.Friends
 import com.mobisharnam.domain.model.firebasedb.NewChatModel
 import com.mobisharnam.domain.model.firebasedb.NewUser
 import com.mobisharnam.domain.util.AppConstant
@@ -36,7 +38,9 @@ class InvitationViewModel(private val invitationUseCase: InvitationUseCase) :
                                                 "Invitation",
                                                 "onSetAdapter  -> ${invitations.get()?.size}"
                                             )
-                                            onSetAdapter.onSetAdapter(AppConstant.INVITATION_ADAPTER)
+                                            onSetAdapter.onSetAdapter(
+                                                AppConstant.INVITATION_ADAPTER
+                                            )
                                         }
 
                                         override fun onCancelled(error: DatabaseError) {
@@ -61,22 +65,23 @@ class InvitationViewModel(private val invitationUseCase: InvitationUseCase) :
 
     fun acceptInvitation(uid: String, accept: Boolean) {
         if (accept) {
-
             val chatId = "${getFireBaseAuth().uid}_$uid"
             val chat = NewChatModel(
                 message = "",
                 senderID = getFireBaseAuth().uid.toString(),
                 dateTime = System.currentTimeMillis(),
-                read = true,
-                senderTyping = false,
-                receiverTyping = false,
-                isChatOnline = false,
                 senderName = "",
                 receiverName = "",
                 chatId = chatId,
-                senderPendingMessage= 0,
-                receiverPendingMessage= 0
+                receiverTyping = false,
+                senderTyping = false,
+                senderPendingMessage = 0,
+                receiverPendingMessage = 0
             )
+            getDataBaseReference().child(AppConstant.TYPING_TABLE).child(chatId)
+                .child(AppConstant.SENDER_TYPING).setValue(false)
+            getDataBaseReference().child(AppConstant.TYPING_TABLE).child(chatId)
+                .child(AppConstant.RECEIVER_TYPING).setValue(false)
             getDataBaseReference().child(AppConstant.CHAT_TABLE).child(chatId).push().setValue(chat)
             getDataBaseReference().child("USerTable").child(getFireBaseAuth().uid.toString())
                 .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -194,5 +199,73 @@ class InvitationViewModel(private val invitationUseCase: InvitationUseCase) :
 
                 }
             })
+    }
+
+    fun acceptInvitation1(uid: String, accept: Boolean) {
+        if (accept) {
+            getDataBaseReference().child("USerTable").child(getFireBaseAuth().uid.toString()).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val friendsReference =  getDataBaseReference().child(AppConstant.FRIEND_TABLE).child(uid).push()
+                    snapshot.getValue<NewUser>()?.let {
+                        val friend = Friends(
+                            friendUid=uid,
+                            name=it.userName,
+                            chatId="${getFireBaseAuth().uid}_$uid",
+                            typing="",
+                            pendingCount = 0,
+                            lastMessage = "",
+                            dateTime = System.currentTimeMillis()
+                        )
+                        friendsReference.setValue(friend)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+
+                }
+            })
+
+            getDataBaseReference().child("USerTable").child(uid).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val friendsReference =  getDataBaseReference().child(AppConstant.FRIEND_TABLE).child(getFireBaseAuth().uid.toString()).push()
+                    snapshot.getValue<NewUser>()?.let {
+                        val friend = Friends(
+                            friendUid=uid,
+                            name=it.userName,
+                            chatId="${getFireBaseAuth().uid}_$uid",
+                            typing="",
+                            pendingCount = 0,
+                            lastMessage = "",
+                            dateTime = System.currentTimeMillis()
+                        )
+                        friendsReference.setValue(friend)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+
+                }
+            })
+        } else {
+            getDataBaseReference().child("Invitations")
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.exists()) {
+                            for (sp in snapshot.children) {
+                                sp.key?.let {
+                                    if (it.contains(uid)) {
+                                        getDataBaseReference().child("Invitations").child(it)
+                                            .removeValue()
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+
+                    }
+                })
+        }
     }
 }

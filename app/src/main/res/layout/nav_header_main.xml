@@ -10,15 +10,33 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/menu_header_image"
-            android:layout_marginTop="50dp"
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/ivUserImage"
+            android:layout_width="@dimen/sw_70dp"
+            android:layout_height="@dimen/sw_70dp"
+            android:layout_marginStart="@dimen/sw_4dp"
+            android:layout_marginEnd="@dimen/sw_4dp"
+            android:background="@drawable/bg_rounded_user_image"
+            app:contentPadding="@dimen/sw_8dp"
+            android:gravity="center"
+            android:textSize="@dimen/sw_22sp"
+            android:layout_marginTop="@dimen/sw_30dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:contentDescription="@string/app_name" />
+            app:shapeAppearanceOverlay="@style/roundedImageViewRounded" />
+
+        <TextView
+            android:id="@+id/tvUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivUserImage"
+            android:layout_marginTop="@dimen/sw_15dp"
+            android:textSize="@dimen/sw_20sp"
+            android:textColor="@color/black"
+            android:textStyle="bold" />
 
         <ImageView
             android:id="@+id/back"

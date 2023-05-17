@@ -20,7 +20,7 @@ class ChattingDetail : BaseFragment<FragmentChatingDetailsBinding, ChatDetailVie
     OnSetAdapter {
 
     private val navArgs: ChattingDetailArgs by navArgs()
-    private var receiverId = ""
+    private var chatId = ""
     override val layoutId: Int
         get() = R.layout.fragment_chating_details
     override val viewModel: ChatDetailViewModel by viewModel()
@@ -31,7 +31,7 @@ class ChattingDetail : BaseFragment<FragmentChatingDetailsBinding, ChatDetailVie
 
         override fun onFinish() {
             Log.e("onFinish", "onFinish")
-            viewModel.setTyping(false,navArgs.receiverId)
+            viewModel.setTyping(false,chatId)
         }
     }
 
@@ -47,14 +47,12 @@ class ChattingDetail : BaseFragment<FragmentChatingDetailsBinding, ChatDetailVie
         super.onPersistentViewCreated(view, savedInstanceState)
 
         AppConstant.isRead = true
-
-        viewModel.userStatus.set(navArgs.userStatus)
-        viewModel.clearNotification(navArgs.receiverId)
-        receiverId = navArgs.receiverId
-
-        viewModel.getChat(receiverId,this)
-        viewModel.getPendingMessage(receiverId)
-        viewModel.setMarkAsRead(receiverId)
+        chatId = navArgs.chatId
+//        viewModel.setMarkAsRead(chatId)
+        viewModel.setMarkAsRead1(chatId)
+        viewModel.setSender(navArgs.userName)
+        viewModel.clearNotification(chatId)
+        viewModel.getChat(chatId,this)
         handelTyping()
     }
 
@@ -63,9 +61,9 @@ class ChattingDetail : BaseFragment<FragmentChatingDetailsBinding, ChatDetailVie
             timer.cancel()
             it?.length?.let {
                 if (it <= 0) {
-                    viewModel.setTyping(false, navArgs.receiverId)
+                    viewModel.setTyping(false, chatId)
                 } else {
-                    viewModel.setTyping(true, navArgs.receiverId)
+                    viewModel.setTyping(true, chatId)
                     timer.start()
                 }
             }
@@ -80,9 +78,9 @@ class ChattingDetail : BaseFragment<FragmentChatingDetailsBinding, ChatDetailVie
             return
         }
         view.setDelay(2000)
-        viewModel.sendNotificationID(navArgs.notificationId,receiverId)
-        viewModel.sendMessage(receiverId,navArgs.notificationId)
-//        viewModel.sendMessage1(receiverId,navArgs.notificationId)
+        viewModel.sendNotificationID(navArgs.notificationId,chatId)
+//        viewModel.sendMessage(chatId,navArgs.notificationId,navArgs.userName)
+        viewModel.sendMessage1(chatId,navArgs.notificationId,navArgs.userName)
     }
 
     override fun onSetAdapter(adapter: String) {

@@ -19,7 +19,6 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.mobisharnam.domain.interacter.BaseUseCase
 import com.mobisharnam.domain.model.firebasedb.NewUser
-import com.mobisharnam.domain.model.firebasedb.User
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -88,7 +87,7 @@ open class BaseViewModel(private val baseUseCase: BaseUseCase) : ViewModel() {
         val reference = getDataBaseReference().child(AppConstant.USER_TABLE).child(uid)
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                snapshot.getValue(User::class.java)?.let {
+                snapshot.getValue(NewUser::class.java)?.let {
                     AppConstant.currentUser = it.userName
                 }
             }

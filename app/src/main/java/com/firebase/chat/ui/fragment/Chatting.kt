@@ -13,18 +13,25 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import com.firebase.chat.R
 import com.firebase.chat.base.BaseFragment
+import com.firebase.chat.callback.OnAdapterChange
 import com.firebase.chat.callback.OnSetAdapter
 import com.firebase.chat.databinding.FragmentChattingBinding
 import com.firebase.chat.ui.adapter.ChatListAdapter
+import com.firebase.chat.ui.adapter.UserListAdapter
 import com.firebase.chat.ui.viewmodel.ChatListViewModel
 import com.firebase.chat.utils.Extension.checkIsTiramisu
 import com.firebase.chat.utils.Extension.checkPermission
-import com.firebase.chat.utils.Extension.toast
+import com.firebase.ui.database.FirebaseRecyclerOptions
+import com.mobisharnam.domain.model.Friends
+import com.mobisharnam.domain.model.firebasedb.NewChatModel
 import com.mobisharnam.domain.util.AppConstant
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnSetAdapter {
+class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnSetAdapter,
+    OnAdapterChange {
 
+    private val chatList = ArrayList<NewChatModel>()
+    private val friendsList = ArrayList<Friends>()
     var searchString = ""
     override val layoutId: Int
         get() = R.layout.fragment_chatting
@@ -51,11 +58,11 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnS
         binding.apply {
             chatFragment = this@Chatting
             viewModel = this@Chatting.viewModel
-           /* adapter = ChatListAdapter(
+            adapter = UserListAdapter(
                 this@Chatting.viewModel.userList.get()!!,
-                this@Chatting.viewModel.chatList.get()!!,
+                friendsList,
                 this@Chatting.viewModel
-            )*/
+            )
         }
     }
 
@@ -66,14 +73,16 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnS
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.getAllUser()
+      //  viewModel.getAllUser()
+        viewModel.getFriends(this)
+
     }
 
     override fun onPersistentViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onPersistentViewCreated(view, savedInstanceState)
 
         AppConstant.isRead = false
-        viewModel.initUserChat(this)
+        viewModel.initUserChat(this,this)
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object :
             OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -108,18 +117,30 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnS
         viewModel.navigate(ChattingDirections.addUserToChattingFragment())
     }
 
+    var check = true
     override fun onSetAdapter(adapter: String) {
-        if (adapter == AppConstant.CHAT_ADAPTER) {
-            viewModel.chatList.get()?.sortByDescending {
-                it.dateTime
-            }
-            Log.e("HOwmannyCall","onSetAdapter")
-//            binding.adapter?.addItem(viewModel.userList.get()!!)
+        friendsList.clear()
+        friendsList.addAll(viewModel.friendList)
+        binding.adapter?.notifyDataSetChanged()
+    }
+
+    override fun onAdapterChange(position: Int, startPosition: Int, endPosition: Int) {
+       /* chatList.clear()
+        viewModel.chatList.get()?.let {
+            chatList.addAll(it)
+        }
+        if (position == -1) {
             binding.adapter = ChatListAdapter(
                 this@Chatting.viewModel.userList.get()!!,
-                this@Chatting.viewModel.chatList.get()!!,
+                chatList,
                 this@Chatting.viewModel
             )
+        }else {
+            binding.adapter?.notifyItemChanged(position)
         }
+        if (startPosition != -1 && endPosition != -1) {
+            binding.adapter?.notifyItemRangeChanged(startPosition,endPosition)
+        }*/
+        Log.e("PrintPOsitions","position ->  $position - $startPosition - $endPosition")
     }
 }

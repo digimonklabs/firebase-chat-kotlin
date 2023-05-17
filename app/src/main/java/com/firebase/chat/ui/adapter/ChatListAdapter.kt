@@ -1,6 +1,5 @@
 package com.firebase.chat.ui.adapter
 
-import android.graphics.Typeface
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.daily.quotes.base.BaseAdapters
@@ -9,39 +8,35 @@ import com.firebase.chat.R
 import com.firebase.chat.databinding.ItemChattingListBinding
 import com.firebase.chat.ui.fragment.ChattingDirections
 import com.firebase.chat.ui.viewmodel.ChatListViewModel
-import com.firebase.chat.utils.Extension.toast
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.getValue
-import com.mobisharnam.domain.model.firebasedb.ChatModel
 import com.mobisharnam.domain.model.firebasedb.NewChatModel
-import com.mobisharnam.domain.model.firebasedb.TypingModel
-import com.mobisharnam.domain.model.firebasedb.UidList
-import com.mobisharnam.domain.model.firebasedb.User
+import com.mobisharnam.domain.model.firebasedb.NewUser
 import com.mobisharnam.domain.util.AppConstant
 import java.util.Calendar
 import java.util.Locale
 import org.json.JSONException
 
 class ChatListAdapter(
-    private val chatModel: ArrayList<User>,
-    private val uid: ArrayList<NewChatModel>,
+    private val chatModel: ArrayList<NewUser>,
+    private var uid: ArrayList<NewChatModel>,
     viewModel: ChatListViewModel
 ) : BaseAdapters<ItemChattingListBinding, ChatListViewModel, NewChatModel>(uid, viewModel) {
 
     lateinit var mBinding: ItemChattingListBinding
-    private val allUserList: java.util.ArrayList<User> =
-        java.util.ArrayList<User>()
-    private val filterUserList: java.util.ArrayList<User> =
-        java.util.ArrayList<User>()
+    private val allUserList: java.util.ArrayList<NewUser> =
+        java.util.ArrayList<NewUser>()
+    private val filterUserList: java.util.ArrayList<NewUser> =
+        java.util.ArrayList<NewUser>()
 
-    fun addItem(item: ArrayList<User>) {
+    fun addItem(item: ArrayList<NewUser>) {
         allUserList.clear()
         filterUserList.clear()
         this.allUserList.addAll(item)
         this.filterUserList.addAll(item)
-        notifyItemRangeChanged(0,item.size - 1)
+        notifyItemRangeChanged(0, item.size - 1)
     }
 
     val calendar: Calendar = Calendar.getInstance()
@@ -55,17 +50,115 @@ class ChatListAdapter(
         holder: BaseViewHolder<ItemChattingListBinding>,
         viewModel: ChatListViewModel
     ) {
-        Log.e("PrintOnBind","PrintOnBind")
+        Log.e("PrintOnBind", "PrintOnBind")
         binding.apply {
-            isMessagePending = false
+           // isMessagePending = false
             mBinding = this
             this.viewModel = viewModel
             userModel = item
-            onlineDot.background = if (item.isChatOnline) ContextCompat.getDrawable(
+            onlineDot.background = if (true) ContextCompat.getDrawable(
                 onlineDot.context,
                 R.drawable.green_dot
             ) else ContextCompat.getDrawable(onlineDot.context, R.drawable.yellow_dot)
-            if (item.senderID == viewModel.getFireBaseAuth().uid) {
+
+            if (item.chatId.split("_")[0] == viewModel.getFireBaseAuth().uid) {
+                tvLastMessage.text = if (item.receiverTyping) root.context.getString(R.string.alert_typing) else item.message
+                isMessagePending = item.receiverPendingMessage != 0
+                pendingMessageCount = item.receiverPendingMessage.toString()
+            }else {
+                tvLastMessage.text = if (item.senderTyping) root.context.getString(R.string.alert_typing) else item.message
+                isMessagePending = item.senderPendingMessage != 0
+                pendingMessageCount = item.senderPendingMessage.toString()
+            }
+
+            /*if (item.chatId.split("_")[0] != viewModel.getFireBaseAuth().uid) {
+                viewModel.getDataBaseReference().child(AppConstant.TYPING_TABLE).child(item.chatId)
+                    .child(AppConstant.SENDER_TYPING)
+                    .addValueEventListener(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (snapshot.exists()) {
+                                snapshot.getValue<Boolean>()?.let { isTyping ->
+                                    tvLastMessage.text =
+                                        if (isTyping) root.context.getString(R.string.alert_typing) else item.message
+                                    Log.e("PrintBooleanValue", "PrintBooleanValue 1-> $isTyping -- ${item.message}")
+                                }
+                            }else {
+                                tvLastMessage.text = ""
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+
+                        }
+
+                    })
+                viewModel.getDataBaseReference().child(AppConstant.PENDING_MESSAGE_TABLE)
+                    .child(item.chatId)
+                    .child(AppConstant.SENDER_PENDING_MESSAGE)
+                    .addValueEventListener(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (snapshot.exists()) {
+                                snapshot.getValue<Int>()?.let { count ->
+                                    isMessagePending = count != 0
+                                    pendingMessageCount = count.toString()
+                                    Log.e("PrintBooleanValue", "count 1-> $count")
+                                }
+                            }else {
+                                isMessagePending = false
+                                pendingMessageCount = ""
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+
+                        }
+
+                    })
+            } else {
+                viewModel.getDataBaseReference().child(AppConstant.TYPING_TABLE).child(item.chatId)
+                    .child(AppConstant.RECEIVER_TYPING)
+                    .addValueEventListener(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (snapshot.exists()) {
+                                snapshot.getValue<Boolean>()?.let { isTyping ->
+                                    tvLastMessage.text =
+                                        if (isTyping) root.context.getString(R.string.alert_typing) else item.message
+                                    Log.e("PrintBooleanValue", "PrintBooleanValue 2-> $isTyping -- ${item.message}")
+                                }
+                            }else {
+                                tvLastMessage.text = ""
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+
+                        }
+                    })
+
+                viewModel.getDataBaseReference().child(AppConstant.PENDING_MESSAGE_TABLE)
+                    .child(item.chatId)
+                    .child(AppConstant.RECEIVER_PENDING_MESSAGE)
+                    .addValueEventListener(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                           if (snapshot.exists()) {
+                               snapshot.getValue<Int>()?.let { count ->
+                                   isMessagePending = count != 0
+                                   pendingMessageCount = count.toString()
+                                   Log.e("PrintBooleanValue", "count 1-> $count")
+                               }
+                           }else {
+                               isMessagePending = false
+                               pendingMessageCount = ""
+                           }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+
+                        }
+                    })
+            }*/
+
+            if (item.chatId.split("_")[0] == viewModel.getFireBaseAuth().uid) {
                 tvUserName.text = item.receiverName
                 try {
                     val name = item.receiverName.split(" ")
@@ -73,7 +166,7 @@ class ChatListAdapter(
                 } catch (e: Exception) {
                     ivUserImage.text = item.receiverName
                 }
-            }else {
+            } else {
                 tvUserName.text = item.senderName
                 try {
                     val name = item.senderName.split(" ")
@@ -82,19 +175,6 @@ class ChatListAdapter(
                     ivUserImage.text = item.senderName
                 }
             }
-
-            if (item.chatId.split("_")[0] != viewModel.getFireBaseAuth().uid) {
-                isMessagePending = item.senderPendingMessage != 0
-                pendingMessageCount = item.senderPendingMessage.toString()
-                tvLastMessage.text = if (item.senderTyping) root.context.getString(R.string.alert_typing) else item.message
-                Log.e("PrintPendingMessage"," senderPendingMessage -> ${item.senderPendingMessage}")
-            } else {
-                isMessagePending = item.receiverPendingMessage != 0
-                pendingMessageCount = item.receiverPendingMessage.toString()
-                tvLastMessage.text = if (item.receiverTyping) root.context.getString(R.string.alert_typing) else item.message
-                Log.e("PrintPendingMessage"," receiverPendingMessage -> ${item.receiverPendingMessage}")
-            }
-
             val yesterDayCalender = Calendar.getInstance()
             val lastTwoDayCalender = Calendar.getInstance()
             yesterDayCalender.add(Calendar.DATE, -1)
@@ -115,18 +195,20 @@ class ChatListAdapter(
         }
 
         holder.itemView.setOnClickListener {
-            val status = if (item.isChatOnline) {
+            val status = if (true) {
                 binding.root.context.getString(R.string.online)
             } else {
                 binding.tvTime.text.toString()
             }
-            viewModel.navigate(
+            /*viewModel.navigate(
                 ChattingDirections.chattingToChattingDetailFragment(
                     item.chatId,
                     status,
-                    0
+                    0,
+                    uid[position].senderName,
+                    uid[position].receiverName,
                 )
-            )
+            )*/
         }
     }
 

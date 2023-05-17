@@ -1,7 +1,6 @@
 package com.firebase.chat.ui.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.SearchView
 import com.firebase.chat.R
@@ -11,8 +10,6 @@ import com.firebase.chat.databinding.FragmentAddUserBinding
 import com.firebase.chat.ui.adapter.AddFriendsAdapter
 import com.firebase.chat.ui.viewmodel.ChatListViewModel
 import com.mobisharnam.domain.util.AppConstant
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AddUser : BaseFragment<FragmentAddUserBinding, ChatListViewModel>(), OnSetAdapter {

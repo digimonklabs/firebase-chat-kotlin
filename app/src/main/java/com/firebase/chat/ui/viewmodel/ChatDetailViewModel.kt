@@ -12,18 +12,17 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.getValue
 import com.mobisharnam.data.source.remote.settings.Setting
 import com.mobisharnam.domain.interacter.ChatDetailUseCase
+import com.mobisharnam.domain.model.Friends
+import com.mobisharnam.domain.model.ReadStatus
 import com.mobisharnam.domain.model.firebasedb.ChatModel
-import com.mobisharnam.domain.model.firebasedb.FriendsList
 import com.mobisharnam.domain.model.firebasedb.NewChatModel
-import com.mobisharnam.domain.model.firebasedb.NewUser
 import com.mobisharnam.domain.util.AppConstant
 import java.util.Calendar
 
 class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
     BaseViewModel(chatDetailUseCase) {
 
-    val chatModel = ObservableField(ArrayList<ChatModel>())
-    val chatListModel = ObservableField(ArrayList<NewChatModel>())
+    val chatListModel = ObservableField(ArrayList<ChatModel>())
     val chatMessage = ObservableField("")
     val chatId = ObservableField("")
     val receiverName = ObservableField("")
@@ -38,47 +37,6 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
         return dateFormat.format(calender.timeInMillis)
     }
 
-    fun sendMessage1(receiverId: String, notificationId: Int) {
-        val message = chatMessage.get()
-        val references =
-            getDataBaseReference().child("/${AppConstant.CHAT_TABLE}/${chatId.get()}")
-                .push()
-        val lastMessage = mapOf(
-            receiverId to FriendsList(
-                lastMessage = message.toString(),
-                dateTime = System.currentTimeMillis()
-            )
-        )
-        getDataBaseReference().child(AppConstant.USER_TABLE).child(getFireBaseAuth().uid.toString())
-            .child(AppConstant.FRIENDS_LIST).updateChildren(lastMessage)
-
-        references.orderByKey().limitToLast(1).ref.removeValue()
-        val chatModel = ChatModel(
-            chatMessage.get().toString(),
-            getFireBaseAuth().uid.toString(),
-            System.currentTimeMillis(),
-            false,
-            ""
-        )
-
-        chatMessage.set("")
-
-        references.setValue(chatModel).addOnCompleteListener {
-            val header = HashMap<String, String>()
-            header[AppConstant.AUTHORIZATION] = AppConstant.SERVER_KEY
-            header[AppConstant.CONTENT_TYPE] = AppConstant.APPLICATION_JSON
-            Setting.HEADER = header
-            chatDetailUseCase.getSendNotification(
-                receiverId,
-                message,
-                chatId.get()!!,
-                notificationId
-            )
-        }.addOnFailureListener {
-            Log.e("chatMessage", "chatMessage fail to send")
-        }
-    }
-
     fun getChat(chatId: String, setAdapter: OnSetAdapter) {
         val chatReference = getDataBaseReference().child(AppConstant.CHAT_TABLE).child(chatId)
         chatReference.addValueEventListener(object : ValueEventListener {
@@ -86,7 +44,7 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
                 chatListModel.set(ArrayList())
                 if (snapshot.exists()) {
                     for (sp in snapshot.children) {
-                        sp.getValue(NewChatModel::class.java)?.let {
+                        sp.getValue(ChatModel::class.java)?.let {
                             chatListModel.get()?.add(it)
                         }
                     }
@@ -101,24 +59,25 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
     }
 
     fun setMarkAsRead(chatId: String) {
-        val messageReference = getDataBaseReference().child(AppConstant.CHAT_TABLE).child(chatId)
+        if (chatId.split("_")[0] != getFireBaseAuth().uid) {
+            getDataBaseReference().child(AppConstant.PENDING_MESSAGE_TABLE).child(chatId)
+                .child(AppConstant.SENDER_PENDING_MESSAGE).setValue(0)
+        } else {
+            getDataBaseReference().child(AppConstant.PENDING_MESSAGE_TABLE).child(chatId)
+                .child(AppConstant.RECEIVER_PENDING_MESSAGE).setValue(0)
+        }
+        val messageReference = getDataBaseReference().child(AppConstant.READ_STATUS).child(chatId)
         messageReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (sp in snapshot.children) {
-                    sp.getValue(NewChatModel::class.java)?.let {
-                        if (it.senderID == getFireBaseAuth().uid) {
+                    sp.getValue(ReadStatus::class.java)?.let {
+                        if (it.senderId != getFireBaseAuth().uid) {
                             messageReference.child(sp.key.toString())
                                 .child(AppConstant.MESSAGE_READ).setValue(true)
                         }
-                        if (chatId.split("_")[0] != getFireBaseAuth().uid) {
-                            messageReference.child(sp.key.toString()).child("senderPendingMessage")
-                                .setValue(0)
-                        } else {
-                            messageReference.child(sp.key.toString())
-                                .child("receiverPendingMessage").setValue(0)
-                        }
                     }
                 }
+                getPendingMessage(chatId)
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -128,21 +87,29 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
     }
 
     fun setTyping(isTyping: Boolean, chatId: String) {
-        getDataBaseReference().child("/${AppConstant.TYPING_TABLE}/${this.chatId.get()}")
-            .child(AppConstant.TYPE).setValue(isTyping)
-        val typingReference =
-            getDataBaseReference().child(AppConstant.CHAT_TABLE).child(chatId).orderByKey()
-                .limitToLast(1)
-        typingReference.addListenerForSingleValueEvent(object : ValueEventListener {
+  /*      val type =
+            if (chatId.split("_")[0] == getFireBaseAuth().uid) AppConstant.SENDER_TYPING else AppConstant.RECEIVER_TYPING
+
+        getDataBaseReference().child(AppConstant.TYPING_TABLE).child(chatId)
+            .child(type).setValue(isTyping)*/
+
+        /*val receiverTyping: Boolean,
+    val senderTyping: Boolean,
+    val senderPendingMessage: Int,
+    val receiverPendingMessage: Int*/
+        val id = chatId.split("_")
+        val receiverId = if (id[0] == getFireBaseAuth().uid) id[1] else id[0]
+        val typingId = if (id[1] == getFireBaseAuth().uid) id[1] else id[0]
+
+        val friendReference = getDataBaseReference().child(AppConstant.FRIEND_TABLE).child(receiverId)
+        friendReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (sp in snapshot.children) {
-                    sp.getValue(NewChatModel::class.java)?.let {
-                        if (chatId.split("_")[0] == getFireBaseAuth().uid) {
-                            typingReference.ref.child(sp.key.toString()).child(AppConstant.SENDER_TYPING)
-                                .setValue(isTyping)
-                        } else {
-                            typingReference.ref.child(sp.key.toString()).child(AppConstant.RECEIVER_TYPING)
-                                .setValue(isTyping)
+                    sp.getValue<Friends>()?.let {
+                        if (it.chatId == chatId && isTyping) {
+                            friendReference.child(sp.key.toString()).child("typing").setValue(typingId)
+                        }else {
+                            friendReference.child(sp.key.toString()).child("typing").setValue("")
                         }
                     }
                 }
@@ -152,6 +119,56 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
 
             }
         })
+
+       /* val friendReference1 = getDataBaseReference().child(AppConstant.FRIEND_TABLE).child(chatId.split("_")[0])
+        friendReference1.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (sp in snapshot.children) {
+                    sp.getValue<Friends>()?.let {
+                        if (it.chatId == chatId) {
+                            friendReference1.child(sp.key.toString()).child("typing").setValue(chatId.split("_")[0])
+                        }
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })*/
+
+      /*  if (chatId.split("_")[0] == getFireBaseAuth().uid) {
+            val typingReference = getDataBaseReference().child(AppConstant.CHAT_TABLE).child(chatId)
+            typingReference.orderByKey().limitToLast(1)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        for (sp in snapshot.children) {
+                            typingReference.child(sp.key.toString()).child("senderTyping")
+                                .setValue(isTyping)
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+
+                    }
+
+                })
+        }else {
+            val typingReference = getDataBaseReference().child(AppConstant.CHAT_TABLE).child(chatId)
+            typingReference.orderByKey().limitToLast(1)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        for (sp in snapshot.children) {
+                            typingReference.child(sp.key.toString()).child("receiverTyping")
+                                .setValue(isTyping)
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+
+                    }
+                })
+        }*/
     }
 
     fun sendNotificationID(notificationId: Int, receiverId: String) {
@@ -176,71 +193,8 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
         })
     }
 
-    private fun setUserName(chatId: String) {
-        val receiver = chatId.split("_")
-        val receiverId = if (receiver[0] == getFireBaseAuth().uid) receiver[1] else receiver[0]
-
-        getDataBaseReference().child("USerTable").child(getFireBaseAuth().uid.toString())
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    snapshot.getValue(NewUser::class.java)?.let { user ->
-                        val chatReference =
-                            getDataBaseReference().child(AppConstant.CHAT_TABLE).child(chatId)
-                        chatReference.orderByKey().limitToLast(1)
-                            .addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(snapshot: DataSnapshot) {
-                                    for (sp in snapshot.children) {
-                                        sp.getValue(NewChatModel::class.java)?.let {
-                                            chatReference.child(sp.key.toString())
-                                                .child("senderName").setValue(user.userName)
-                                        }
-                                    }
-                                }
-
-                                override fun onCancelled(error: DatabaseError) {
-
-                                }
-                            })
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-
-                }
-            })
-
-        getDataBaseReference().child("USerTable").child(receiverId)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    snapshot.getValue(NewUser::class.java)?.let { user ->
-                        val chatReference =
-                            getDataBaseReference().child(AppConstant.CHAT_TABLE).child(chatId)
-                        chatReference.orderByKey().limitToLast(1)
-                            .addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(snapshot: DataSnapshot) {
-                                    for (sp in snapshot.children) {
-                                        sp.getValue(NewChatModel::class.java)?.let {
-                                            chatReference.child(sp.key.toString())
-                                                .child("receiverName").setValue(user.userName)
-                                        }
-                                    }
-                                }
-
-                                override fun onCancelled(error: DatabaseError) {
-
-                                }
-                            })
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-
-                }
-            })
-    }
-
-    fun sendMessage(chatID: String, notificationId: Int) {
-        val message = chatMessage.get()
+    fun sendMessage(chatID: String, notificationId: Int, userName: String) {
+        val message = chatMessage.get()?.trim()
         val references =
             getDataBaseReference().child(AppConstant.CHAT_TABLE).child(chatID)
                 .push()
@@ -252,50 +206,79 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
             receiverPendingMessageCount.set(receiverPendingMessageCount.get()?.plus(1))
             receiver[0]
         }
-
-        setUserName(chatID)
-        val chat = NewChatModel(
+        val chat = ChatModel(
+            chatId = chatID,
             message = message.toString(),
             senderID = getFireBaseAuth().uid.toString(),
             dateTime = System.currentTimeMillis(),
-            read = false,
-            senderTyping = false,
-            receiverTyping = false,
-            isChatOnline = true,
-            senderName = "",
-            receiverName = "",
-            chatId = chatID,
-            senderPendingMessage = senderPendingMessageCount.get() ?: 0,
-            receiverPendingMessage = receiverPendingMessageCount.get() ?: 0
+            read = true
         )
 
         chatMessage.set("")
 
+        val readStatus = ReadStatus(getFireBaseAuth().uid.toString(), false)
+        getDataBaseReference().child(AppConstant.READ_STATUS).child(chatID).push()
+            .setValue(readStatus)
+
         references.setValue(chat).addOnCompleteListener {
-            references.orderByKey().limitToLast(1)
+            if (receiver[0] == getFireBaseAuth().uid) {
+                getDataBaseReference().child(AppConstant.PENDING_MESSAGE_TABLE).child(chatID)
+                    .child(AppConstant.SENDER_PENDING_MESSAGE)
+                    .setValue(senderPendingMessageCount.get())
+            } else {
+                getDataBaseReference().child(AppConstant.PENDING_MESSAGE_TABLE).child(chatID)
+                    .child(AppConstant.RECEIVER_PENDING_MESSAGE)
+                    .setValue(receiverPendingMessageCount.get())
+            }
             val header = HashMap<String, String>()
             header[AppConstant.AUTHORIZATION] = AppConstant.SERVER_KEY
             header[AppConstant.CONTENT_TYPE] = AppConstant.APPLICATION_JSON
             Setting.HEADER = header
             chatDetailUseCase.getSendNotification(receiverId, message, chatID, notificationId)
         }.addOnFailureListener {
+            getDataBaseReference().child(AppConstant.READ_STATUS).child(chatID).orderByKey().limitToLast(1).ref.removeValue()
             Log.e("chatMessage", "chatMessage fail to send")
         }
     }
 
     fun getPendingMessage(chatId: String) {
         val bothId = chatId.split("_")
-        getDataBaseReference().child(AppConstant.CHAT_TABLE).child(chatId)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
+
+        val chatReference = getDataBaseReference().child(AppConstant.CHAT_TABLE).child(chatId)
+        chatReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var receiverCount = 0
+                var senderCount = 0
+                for (sp in snapshot.children) {
+                    sp.getValue<ChatModel>()?.let {
+                        if (!it.read) {
+                            if (bothId[0] == it.senderID) {
+                                senderCount++
+                            } else {
+                                receiverCount++
+                            }
+                        }
+                    }
+                }
+                receiverPendingMessageCount.set(receiverCount)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
+
+        getDataBaseReference().child(AppConstant.READ_STATUS).child(chatId)
+            .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     senderPendingMessageCount.set(0)
                     receiverPendingMessageCount.set(0)
                     var receiverCount = 0
                     var senderCount = 0
                     for (sp in snapshot.children) {
-                        sp.getValue(NewChatModel::class.java)?.let {
+                        sp.getValue(ReadStatus::class.java)?.let {
                             if (!it.read) {
-                                if (bothId[0] == it.senderID) {
+                                if (bothId[0] == it.senderId) {
                                     senderCount++
                                 } else {
                                     receiverCount++
@@ -305,11 +288,136 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
                     }
                     senderPendingMessageCount.set(senderCount)
                     receiverPendingMessageCount.set(receiverCount)
+                    Log.e("PrintPendngCount", " count is -> $senderCount ${senderPendingMessageCount.get()}  $receiverCount  ${receiverPendingMessageCount.get()}")
                 }
 
                 override fun onCancelled(error: DatabaseError) {
 
                 }
             })
+    }
+
+    fun setSender(
+        userName: String
+    ) {
+        receiverName.set(userName)
+        try {
+            val name = userName.split(" ")
+            userImageName.set(name[0][0] + name[1][0].toString())
+        } catch (e: Exception) {
+            userImageName.set(userName.first().toString())
+        }
+    }
+
+    fun sendMessage1(chatId: String, notificationId: Int, userName: String) {
+        val message = chatMessage.get()?.trim()
+        val references =
+            getDataBaseReference().child(AppConstant.CHAT_TABLE).child(chatId)
+                .push()
+        val receiver = chatId.split("_")
+        val receiverId = if (receiver[0] == getFireBaseAuth().uid) {
+            senderPendingMessageCount.set(senderPendingMessageCount.get()?.plus(1))
+            receiver[1]
+        } else {
+            receiverPendingMessageCount.set(receiverPendingMessageCount.get()?.plus(1))
+            receiver[0]
+        }
+        val chat = ChatModel(
+            chatId = chatId,
+            message = message.toString(),
+            senderID = getFireBaseAuth().uid.toString(),
+            dateTime = System.currentTimeMillis(),
+            read = true
+        )
+
+        chatMessage.set("")
+
+        references.setValue(chat).addOnCompleteListener {
+            val friendReference = getDataBaseReference().child(AppConstant.FRIEND_TABLE).child(getFireBaseAuth().uid.toString())
+            friendReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (sp in snapshot.children) {
+                        sp.getValue<Friends>()?.let {
+                            if (it.chatId == chatId) {
+                                friendReference.child(sp.key.toString()).child("lastMessage").setValue(message)
+                                friendReference.child(sp.key.toString()).child("typing").setValue("")
+                                friendReference.child(sp.key.toString()).child("pendingCount").setValue(0)
+                            }
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+
+                }
+            })
+
+            val receiverReferenceReference = getDataBaseReference().child(AppConstant.FRIEND_TABLE).child(receiverId)
+            receiverReferenceReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (sp in snapshot.children) {
+                        sp.getValue<Friends>()?.let {
+                            if (it.chatId == chatId) {
+                                receiverReferenceReference.child(sp.key.toString()).child("lastMessage").setValue(message)
+                                receiverReferenceReference.child(sp.key.toString()).child("typing").setValue("")
+                                Log.e("receiverPendingMessageCount","receiverPendingMessageCount -> ${receiverPendingMessageCount.get()}")
+                                receiverReferenceReference.child(sp.key.toString()).child("pendingCount").setValue(receiverPendingMessageCount.get() ?: 0)
+                            }
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+
+                }
+            })
+
+            val header = HashMap<String, String>()
+            header[AppConstant.AUTHORIZATION] = AppConstant.SERVER_KEY
+            header[AppConstant.CONTENT_TYPE] = AppConstant.APPLICATION_JSON
+            Setting.HEADER = header
+           // chatDetailUseCase.getSendNotification(receiverId, message, chatId, notificationId)
+        }.addOnFailureListener {
+            Log.e("chatMessage", "chatMessage fail to send")
+        }
+    }
+
+    fun setMarkAsRead1(chatId: String) {
+        val friendReference = getDataBaseReference().child(AppConstant.FRIEND_TABLE).child(getFireBaseAuth().uid.toString())
+        friendReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (sp in snapshot.children) {
+                    sp.getValue<Friends>()?.let {
+                        if (it.chatId == chatId) {
+                            friendReference.child(sp.key.toString()).child("pendingCount").setValue(0)
+                        }
+                    }
+                }
+                getPendingMessage(chatId)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
+
+        val messageReference = getDataBaseReference().child(AppConstant.READ_STATUS).child(chatId)
+        messageReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (sp in snapshot.children) {
+                    sp.getValue(ReadStatus::class.java)?.let {
+                        if (it.senderId != getFireBaseAuth().uid) {
+                            messageReference.child(sp.key.toString())
+                                .child(AppConstant.MESSAGE_READ).setValue(true)
+                        }
+                    }
+                }
+                getPendingMessage(chatId)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
     }
 }

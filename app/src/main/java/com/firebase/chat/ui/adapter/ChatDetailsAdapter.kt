@@ -1,7 +1,6 @@
 package com.firebase.chat.ui.adapter
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +15,7 @@ import com.mobisharnam.domain.model.firebasedb.NewChatModel
 
 class ChatDetailsAdapter(
     private val context: Context,
-    private val chatMessage: ArrayList<NewChatModel>,
+    private val chatMessage: ArrayList<ChatModel>,
     private val viewModel: ChatDetailViewModel
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -24,7 +23,7 @@ class ChatDetailsAdapter(
     private val VIEW_TYPE_RECEIVER = 2
 
     inner class SenderViewHolder(val binding: SenderChatLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bindData(chatModel: NewChatModel) {
+        fun bindData(chatModel: ChatModel) {
             if (chatModel.message.isNotEmpty()) {
                 binding.tvSenderMessage.visibility = View.VISIBLE
                 binding.tvDateTime.visibility = View.VISIBLE
@@ -38,7 +37,7 @@ class ChatDetailsAdapter(
     }
 
     inner class ReceiverViewHolder(val binding: ReceiverChatLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bindData(chatModel: NewChatModel) {
+        fun bindData(chatModel: ChatModel) {
             if (chatModel.message.isNotEmpty()) {
                 binding.tvSenderMessage.visibility = View.VISIBLE
                 binding.tvDateTime.visibility = View.VISIBLE

@@ -32,11 +32,13 @@ class InvitationAdapter(
             }
 
             btnAccept.setOnClickListener {
-                viewModel.acceptInvitation(item.uid,true)
+                //viewModel.acceptInvitation(item.uid,true)
+                viewModel.acceptInvitation1(item.uid,true)
             }
 
             btnDenied.setOnClickListener {
-                viewModel.acceptInvitation(item.uid,false)
+                //viewModel.acceptInvitation(item.uid,false)
+                viewModel.acceptInvitation1(item.uid,false)
             }
         }
     }

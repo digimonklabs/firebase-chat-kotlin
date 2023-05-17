@@ -6,6 +6,7 @@ object AppConstant {
     const val INVITATION_ADAPTER = "invitationAdapter"
     const val ADD_FRIENDS_ADAPTER = "addFriendsAdapter"
     const val CHAT_ADAPTER = "chatAdapter"
+    const val CHILD = "child"
     const val CHAT_DETAILS_ADAPTER_ADAPTER = "chatDetailsAdapter"
 
     const val APP_PACKAGE = "app_package"
@@ -16,7 +17,9 @@ object AppConstant {
     const val USER_TABLE = "User"
     const val CHAT_TABLE = "Chat"
     const val TYPING_TABLE = "Typing"
+    const val FRIEND_TABLE = "Friend"
     const val NOTIFICATION_TABLE = "NotificationTable"
+    const val READ_STATUS = "ReadStatus"
     const val USER_ONLINE = "online"
     const val MESSAGE_READ = "read"
     const val TOKEN = "token"
@@ -24,6 +27,9 @@ object AppConstant {
     const val FRIENDS_LIST = "friendsList"
     const val RECEIVER_TYPING = "receiverTyping"
     const val SENDER_TYPING = "senderTyping"
+    const val PENDING_MESSAGE_TABLE = "PendingMessage"
+    const val SENDER_PENDING_MESSAGE = "senderPendingMessage"
+    const val RECEIVER_PENDING_MESSAGE = "receiverPendingMessage"
     var currentUser = ""
 
     // Firebase auth

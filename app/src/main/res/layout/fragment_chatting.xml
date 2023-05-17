@@ -12,7 +12,7 @@
 
         <variable
             name="adapter"
-            type="com.firebase.chat.ui.adapter.ChatListAdapter" />
+            type="com.firebase.chat.ui.adapter.UserListAdapter" />
 
         <variable
             name="viewModel"

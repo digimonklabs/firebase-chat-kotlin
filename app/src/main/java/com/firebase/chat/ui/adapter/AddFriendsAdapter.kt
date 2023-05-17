@@ -5,10 +5,7 @@ import com.daily.quotes.base.BaseViewHolder
 import com.firebase.chat.R
 import com.firebase.chat.databinding.ItemAddFriendsBinding
 import com.firebase.chat.ui.viewmodel.ChatListViewModel
-import com.mobisharnam.domain.model.firebasedb.FriendsList
 import com.mobisharnam.domain.model.firebasedb.NewUser
-import com.mobisharnam.domain.model.firebasedb.UidList
-import com.mobisharnam.domain.model.firebasedb.User
 import java.util.Locale
 import org.json.JSONException
 

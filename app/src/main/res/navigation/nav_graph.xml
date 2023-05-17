@@ -81,16 +81,16 @@
         tools:layout="@layout/fragment_chating_details">
 
         <argument
-            android:name="receiverId"
-            app:argType="string" />
-
-        <argument
-            android:name="userStatus"
+            android:name="chatId"
             app:argType="string" />
 
         <argument
             android:name="notificationId"
             app:argType="integer"/>
+
+        <argument
+            android:name="userName"
+            app:argType="string" />
 
     </fragment>
 

@@ -4,18 +4,17 @@ import android.os.Parcelable
 
 @kotlinx.parcelize.Parcelize
 class NewChatModel(
-    val message: String,
+    val chatId: String,
     val senderID: String,
+    val message: String,
     val dateTime: Long,
-    val read: Boolean,
-    val senderTyping: Boolean,
-    val receiverTyping: Boolean,
-    val isChatOnline: Boolean,
     val senderName: String,
     val receiverName: String,
-    val chatId: String,
+    val receiverTyping: Boolean,
+    val senderTyping: Boolean,
     val senderPendingMessage: Int,
     val receiverPendingMessage: Int
-): Parcelable {
-    constructor() : this( "", "", 0, false,false,false,false,"","","",0,0)
+) : Parcelable {
+
+    constructor() : this("", "", "",0, "", "",false,false,0,0)
 }

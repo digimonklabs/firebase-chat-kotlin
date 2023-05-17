@@ -9,7 +9,6 @@ import com.firebase.chat.ui.viewmodel.RegisterViewModel
 import com.mobisharnam.domain.util.AppConstant
 import com.firebase.chat.utils.Extension.toast
 import com.mobisharnam.domain.model.firebasedb.NewUser
-import com.mobisharnam.domain.model.firebasedb.User
 import java.util.Random
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

@@ -2,10 +2,10 @@ package com.firebase.chat.ui.activity
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -14,11 +14,15 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import com.firebase.chat.R
+import com.firebase.chat.base.BaseViewModel
 import com.firebase.chat.databinding.ActivityMainBinding
+import com.firebase.chat.ui.viewmodel.ChatDetailViewModel
 import com.google.android.material.navigation.NavigationView
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
+    private val viewModel : BaseViewModel by viewModel()
     private lateinit var binding: ActivityMainBinding
     private lateinit var toggle: ActionBarDrawerToggle
     private var currentDestination: NavDestination? = null
@@ -73,6 +77,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         binding.navView.setNavigationItemSelectedListener(this)
+        /*val headerView = binding.navView.inflateHeaderView(R.layout.nav_header_main)
+        val sortName = headerView.findViewById<TextView>(R.id.ivUserImage)
+        val userName = headerView.findViewById<TextView>(R.id.tvUserName)
+        val name = viewModel.getFireBaseAuth().currentUser?.displayName
+        userName.text = name
+        val displayName = name?.split(" ")
+        sortName.text = try {
+            displayName!![0][1].toString() + displayName!![1][0].toString()
+        }catch (e: Exception) {
+            e.printStackTrace()
+            name?.get(0)?.toString() ?: ""
+        }*/
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
