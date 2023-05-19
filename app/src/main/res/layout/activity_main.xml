@@ -30,5 +30,4 @@
             app:menu="@menu/chat_menu" />
 
     </androidx.drawerlayout.widget.DrawerLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

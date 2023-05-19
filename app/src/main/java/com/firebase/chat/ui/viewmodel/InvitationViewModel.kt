@@ -208,10 +208,10 @@ class InvitationViewModel(private val invitationUseCase: InvitationUseCase) :
                     val friendsReference =  getDataBaseReference().child(AppConstant.FRIEND_TABLE).child(uid).push()
                     snapshot.getValue<NewUser>()?.let {
                         val friend = Friends(
-                            friendUid=uid,
-                            name=it.userName,
-                            chatId="${getFireBaseAuth().uid}_$uid",
-                            typing="",
+                            friendUid = it.uid,
+                            name = it.userName,
+                            chatId = "${getFireBaseAuth().uid}_$uid",
+                            typing = "",
                             pendingCount = 0,
                             lastMessage = "",
                             dateTime = System.currentTimeMillis()
@@ -230,10 +230,10 @@ class InvitationViewModel(private val invitationUseCase: InvitationUseCase) :
                     val friendsReference =  getDataBaseReference().child(AppConstant.FRIEND_TABLE).child(getFireBaseAuth().uid.toString()).push()
                     snapshot.getValue<NewUser>()?.let {
                         val friend = Friends(
-                            friendUid=uid,
-                            name=it.userName,
-                            chatId="${getFireBaseAuth().uid}_$uid",
-                            typing="",
+                            friendUid = it.uid,
+                            name = it.userName,
+                            chatId = "${getFireBaseAuth().uid}_$uid",
+                            typing = "",
                             pendingCount = 0,
                             lastMessage = "",
                             dateTime = System.currentTimeMillis()
@@ -246,26 +246,25 @@ class InvitationViewModel(private val invitationUseCase: InvitationUseCase) :
 
                 }
             })
-        } else {
-            getDataBaseReference().child("Invitations")
-                .addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.exists()) {
-                            for (sp in snapshot.children) {
-                                sp.key?.let {
-                                    if (it.contains(uid)) {
-                                        getDataBaseReference().child("Invitations").child(it)
-                                            .removeValue()
-                                    }
+        }
+        getDataBaseReference().child("Invitations")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        for (sp in snapshot.children) {
+                            sp.key?.let {
+                                if (it.contains(uid)) {
+                                    getDataBaseReference().child("Invitations").child(it)
+                                        .removeValue()
                                 }
                             }
                         }
                     }
+                }
 
-                    override fun onCancelled(error: DatabaseError) {
+                override fun onCancelled(error: DatabaseError) {
 
-                    }
-                })
-        }
+                }
+            })
     }
 }

@@ -18,12 +18,14 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.mobisharnam.domain.interacter.BaseUseCase
+import com.mobisharnam.domain.model.Invitation
 import com.mobisharnam.domain.model.firebasedb.NewUser
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 open class BaseViewModel(private val baseUseCase: BaseUseCase) : ViewModel() {
 
+    val sendInvitationList = ObservableField(ArrayList<Invitation>())
     val noFriend = ObservableBoolean(false)
     val existFriendList = ObservableField(ArrayList<String>())
     val invitationList = ObservableField(ArrayList<String>())

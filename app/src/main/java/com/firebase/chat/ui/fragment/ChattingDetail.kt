@@ -49,7 +49,7 @@ class ChattingDetail : BaseFragment<FragmentChatingDetailsBinding, ChatDetailVie
         AppConstant.isRead = true
         chatId = navArgs.chatId
 //        viewModel.setMarkAsRead(chatId)
-        viewModel.setMarkAsRead1(chatId)
+        viewModel.setMarkAsRead(chatId)
         viewModel.setSender(navArgs.userName)
         viewModel.clearNotification(chatId)
         viewModel.getChat(chatId,this)
@@ -80,7 +80,7 @@ class ChattingDetail : BaseFragment<FragmentChatingDetailsBinding, ChatDetailVie
         view.setDelay(2000)
         viewModel.sendNotificationID(navArgs.notificationId,chatId)
 //        viewModel.sendMessage(chatId,navArgs.notificationId,navArgs.userName)
-        viewModel.sendMessage1(chatId,navArgs.notificationId,navArgs.userName)
+        viewModel.sendMessage(chatId,navArgs.notificationId,navArgs.userName)
     }
 
     override fun onSetAdapter(adapter: String) {

@@ -40,6 +40,7 @@ class DashBoard : BaseFragment<FragmentDashBoardBinding, BaseViewModel>() {
         FirebaseDatabase.getInstance().getReference(AppConstant.NOTIFICATION_TABLE).keepSynced(true)
         FirebaseDatabase.getInstance().getReference(AppConstant.READ_STATUS).keepSynced(true)
         FirebaseDatabase.getInstance().getReference(AppConstant.PENDING_MESSAGE_TABLE).keepSynced(true)
+        FirebaseDatabase.getInstance().getReference(AppConstant.FRIEND_TABLE).keepSynced(true)
 
 
        /* viewModel.getDataBaseReference().child(AppConstant.USER_TABLE).child(

@@ -12,6 +12,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.getValue
 import com.mobisharnam.domain.interacter.ChatListUseCase
 import com.mobisharnam.domain.model.Friends
+import com.mobisharnam.domain.model.Invitation
 import com.mobisharnam.domain.model.firebasedb.NewChatModel
 import com.mobisharnam.domain.model.firebasedb.NewUser
 import com.mobisharnam.domain.util.AppConstant
@@ -231,17 +232,48 @@ class ChatListViewModel(private val chatListUseCase: ChatListUseCase) :
     }
 
     fun sendInvitation() {
-        existFriendList.get()?.forEach { friendUid ->
-            val invitationId = "${getFireBaseAuth().uid}_${friendUid}"
-            getDataBaseReference().child("Invitations").child(invitationId).setValue(true)
-        }
+        Log.e("sendInvitation","sendInvitation -> ${invitationList.get()?.size}")
+        getDataBaseReference().child("USerTable").child(getFireBaseAuth().uid.toString()).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val senderName = snapshot.getValue(NewUser::class.java)?.userName
+                sendInvitationList.get()?.forEach { friendUid ->
+                    val invitationReference = getDataBaseReference().child("Invitations").child(friendUid.senderId)
+                    invitationReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (snapshot.exists()) {
+                                for (sp in snapshot.children) {
+                                    sp.getValue<Invitation>()?.let {
+                                        Log.e("PrintSenderID"," id is  -> ${it.senderId}==${getFireBaseAuth().uid}")
+                                        if (it.senderId != getFireBaseAuth().uid) {
+                                            val invitation = Invitation(senderName = senderName ?: "", senderId = getFireBaseAuth().uid.toString())
+                                            invitationReference.setValue(invitation)
+                                        }
+                                    }
+                                }
+                            }else {
+                                Log.e("PrintSenderID"," id is  -> in else llopp")
+                                val invitation = Invitation(senderName = senderName ?: "", senderId = getFireBaseAuth().uid.toString())
+                                invitationReference.setValue(invitation)
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+
+                        }
+                    })
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
     }
 
     fun getFriends(onSetAdapter: OnSetAdapter) {
         val friendsReference = getDataBaseReference().child(AppConstant.FRIEND_TABLE).child(getFireBaseAuth().uid.toString())
         friendsReference.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                Log.e("getFriends","getFriends onChildAdded")
                 snapshot.getValue<Friends>()?.let {
                     friendList.add(it)
                 }
@@ -249,14 +281,19 @@ class ChatListViewModel(private val chatListUseCase: ChatListUseCase) :
                     it.dateTime
                 }
                 onSetAdapter.onSetAdapter("")
-                Log.e("PrintFrinedSize","PrintFrinedSize -> ${friendList.size}")
+                Log.e("getFriends","onChildAdded -> ${friendList.size}")
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                Log.e("getFriends","getFriends onChildChanged ${friendList.size} ${snapshot.key}")
+                Log.e("getFriends"," onChildChanged size -> ${friendList.size} ${snapshot.key} previousChildName -> $previousChildName")
                 snapshot.getValue<Friends>()?.let {
-                    friendList.removeAt(0)
-                    friendList.add(it)
+                    Log.e("PrintSnapShortSize","size -> ${friendList.size}")
+                    for (i in 0 until friendList.size) {
+                        if (it.chatId == friendList[i].chatId) {
+                            friendList.removeAt(i)
+                            friendList.add(it)
+                        }
+                    }
                 }
                 Log.e("getFriends","getFriends onChildChanged after ${friendList.size}")
                 friendList.sortByDescending {
@@ -276,7 +313,6 @@ class ChatListViewModel(private val chatListUseCase: ChatListUseCase) :
             override fun onCancelled(error: DatabaseError) {
 
             }
-
         })
     }
 }

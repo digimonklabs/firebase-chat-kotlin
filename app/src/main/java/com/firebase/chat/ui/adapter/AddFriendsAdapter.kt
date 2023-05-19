@@ -5,6 +5,7 @@ import com.daily.quotes.base.BaseViewHolder
 import com.firebase.chat.R
 import com.firebase.chat.databinding.ItemAddFriendsBinding
 import com.firebase.chat.ui.viewmodel.ChatListViewModel
+import com.mobisharnam.domain.model.Invitation
 import com.mobisharnam.domain.model.firebasedb.NewUser
 import java.util.Locale
 import org.json.JSONException
@@ -45,11 +46,13 @@ class AddFriendsAdapter(
         binding.checkUser.setOnCheckedChangeListener { compoundButton, isCheck ->
             when (isCheck) {
                 true -> {
-                    viewModel.existFriendList.get()?.add(userModel[position].uid)
+                    val invitation = Invitation(userModel[position].uid,userModel[position].userName)
+                    viewModel.sendInvitationList.get()?.add(invitation)
                 }
 
                 false -> {
-                    viewModel.existFriendList.get()?.remove(userModel[position].uid)
+                    val invitation = Invitation(userModel[position].uid,userModel[position].userName)
+                    viewModel.sendInvitationList.get()?.remove(invitation)
                 }
             }
         }
