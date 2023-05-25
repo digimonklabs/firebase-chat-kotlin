@@ -9,9 +9,10 @@ class Friends(
     val name: String,
     val chatId: String,
     val typing: String,
+    val typingId: String,
     val pendingCount: Int,
     val lastMessage: String,
     val dateTime: Long
 ): Parcelable {
-    constructor() : this( "", "", "", "", 0, "", 0)
+    constructor() : this( "", "", "", "", "",0, "", 0)
 }

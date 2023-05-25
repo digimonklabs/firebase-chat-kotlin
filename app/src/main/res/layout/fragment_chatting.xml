@@ -78,7 +78,7 @@
             android:paddingVertical="@dimen/sw_10dp"
             android:text="@string/add_friends"
             android:visibility="@{viewModel.noFriend ? View.VISIBLE : View.GONE}"
-            android:onClick="@{ (v) -> chatFragment.onAddFriend()}"
+            android:onClick="@{ (v) -> chatFragment.onAddFriend(v)}"
             android:textColor="@color/white"
             android:textSize="@dimen/sw_14sp"
             app:cornerRadius="@dimen/sw_6dp"

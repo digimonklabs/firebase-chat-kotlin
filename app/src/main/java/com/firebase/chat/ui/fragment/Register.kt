@@ -59,19 +59,22 @@ class Register : BaseFragment<FragmentRegisterBinding, RegisterViewModel>() {
                         friendsList = ArrayList(),
                         invitationList = ArrayList(),
                         token = "",
-                        notificationId = Random().nextInt(5001)
+                        notificationId = Random().nextInt(5001),
+                        lastSeen = System.currentTimeMillis()
                     )
 
-                    rootReferences.child("USerTable").child(user!!.uid).setValue(userTable)
+                    rootReferences.child(AppConstant.USER_TABLE).child(user!!.uid).setValue(userTable)
                         .addOnSuccessListener {
                             mContext.toast(getString(R.string.register_successfully))
                             user.uid.let {
                                 viewModel.currentUserName(it)
                                 viewModel.setToken(it)
-                                viewModel.getDataBaseReference().child("USerTable").child(it).child(
+                                viewModel.getDataBaseReference().child(AppConstant.USER_TABLE).child(it).child(
                                     AppConstant.USER_ONLINE).ref.setValue(true)
-                                viewModel.getDataBaseReference().child("USerTable").child(it).child(
+                                viewModel.getDataBaseReference().child(AppConstant.USER_TABLE).child(it).child(
                                     AppConstant.USER_ONLINE).ref.onDisconnect().setValue(false)
+                                viewModel.getDataBaseReference().child(AppConstant.USER_TABLE).child(it).child(
+                                    AppConstant.LAST_SEEN).ref.onDisconnect().setValue(System.currentTimeMillis())
                             }
                             viewModel.navigate(RegisterDirections.registerToChattingFragment())
                         }.addOnFailureListener {

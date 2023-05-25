@@ -7,6 +7,8 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -23,6 +25,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.mobisharnam.domain.model.firebasedb.NewUser
+import com.mobisharnam.domain.util.AppConstant
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -82,9 +85,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         binding.navView.setNavigationItemSelectedListener(this)
-        viewModel.getDataBaseReference().child("USerTable").child(viewModel.getFireBaseAuth().uid.toString()).addListenerForSingleValueEvent(object : ValueEventListener {
+        viewModel.getDataBaseReference().child(AppConstant.USER_TABLE).child(viewModel.getFireBaseAuth().uid.toString()).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                Log.e("getDataBaseReference","getDataBaseReference")
                 snapshot.getValue(NewUser::class.java)?.let {
                     val name = it.userName
                     binding.navView.getHeaderView(0).findViewById<TextView>(R.id.tvUserName).text = name

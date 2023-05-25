@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="invitationViewModel"
             type="com.firebase.chat.ui.viewmodel.InvitationViewModel" />
@@ -53,6 +55,18 @@
             app:layout_constraintStart_toEndOf="@+id/ivBack"
             app:layout_constraintTop_toTopOf="@+id/ivBack" />
 
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/sw_20dp"
+            android:gravity="center"
+            android:text="@string/no_invitation_found"
+            android:textColor="@color/black"
+            android:textSize="@dimen/sw_14sp"
+            android:visibility="@{invitationViewModel.noInvitation ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/header" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvInvitations"
             android:layout_width="match_parent"
@@ -60,6 +74,7 @@
             android:adapter="@{adapter}"
             android:orientation="vertical"
             android:paddingTop="@dimen/sw_10dp"
+            android:visibility="@{invitationViewModel.noInvitation ? View.GONE : View.VISIBLE}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/header" />

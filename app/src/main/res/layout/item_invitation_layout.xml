@@ -5,7 +5,7 @@
     <data>
         <variable
             name="user"
-            type="com.mobisharnam.domain.model.firebasedb.NewUser" />
+            type="com.mobisharnam.domain.model.Invitation" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -35,7 +35,7 @@
             android:textStyle="bold"
             android:singleLine="true"
             android:ellipsize="end"
-            android:text="@{user.userName}"
+            android:text="@{user.senderName}"
             app:layout_constraintBottom_toTopOf="@+id/btnAccept"
             app:layout_constraintStart_toEndOf="@+id/ivUserImage"
             app:layout_constraintTop_toTopOf="@+id/ivUserImage" />

@@ -5,19 +5,19 @@ import com.daily.quotes.base.BaseViewHolder
 import com.firebase.chat.R
 import com.firebase.chat.databinding.ItemInvitationLayoutBinding
 import com.firebase.chat.ui.viewmodel.InvitationViewModel
-import com.mobisharnam.domain.model.firebasedb.NewUser
+import com.mobisharnam.domain.model.Invitation
 
 class InvitationAdapter(
-    userList: ArrayList<NewUser>,
+    userList: ArrayList<Invitation>,
     viewModel: InvitationViewModel,
-): BaseAdapters<ItemInvitationLayoutBinding, InvitationViewModel, NewUser>(userList, viewModel) {
+): BaseAdapters<ItemInvitationLayoutBinding, InvitationViewModel, Invitation>(userList, viewModel) {
 
     override val layoutId: Int
         get() = R.layout.item_invitation_layout
 
     override fun bind(
         binding: ItemInvitationLayoutBinding,
-        item: NewUser,
+        item: Invitation,
         position: Int,
         holder: BaseViewHolder<ItemInvitationLayoutBinding>,
         viewModel: InvitationViewModel
@@ -25,20 +25,20 @@ class InvitationAdapter(
         binding.apply {
             user = item
             try {
-                val name = item.userName.split(" ")
+                val name = item.senderName.split(" ")
                 ivUserImage.text = name[0][0] + name[1][0].toString()
             } catch (e: Exception) {
-                ivUserImage.text = item.userName[0].toString()
+                ivUserImage.text = item.senderName[0].toString()
             }
 
             btnAccept.setOnClickListener {
                 //viewModel.acceptInvitation(item.uid,true)
-                viewModel.acceptInvitation1(item.uid,true)
+                viewModel.acceptInvitation(item.senderId,true)
             }
 
             btnDenied.setOnClickListener {
                 //viewModel.acceptInvitation(item.uid,false)
-                viewModel.acceptInvitation1(item.uid,false)
+                viewModel.acceptInvitation(item.senderId,false)
             }
         }
     }

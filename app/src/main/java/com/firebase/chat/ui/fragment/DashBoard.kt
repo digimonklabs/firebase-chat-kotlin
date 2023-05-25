@@ -34,13 +34,13 @@ class DashBoard : BaseFragment<FragmentDashBoardBinding, BaseViewModel>() {
         Firebase.database.setPersistenceEnabled(true)
         Firebase.database.setPersistenceCacheSizeBytes(100 * 1000 * 1000)
         FirebaseDatabase.getInstance().getReference(AppConstant.USER_TABLE).keepSynced(true)
-        FirebaseDatabase.getInstance().getReference("USerTable").keepSynced(true)
         FirebaseDatabase.getInstance().getReference(AppConstant.CHAT_TABLE).keepSynced(true)
         FirebaseDatabase.getInstance().getReference(AppConstant.TYPING_TABLE).keepSynced(true)
         FirebaseDatabase.getInstance().getReference(AppConstant.NOTIFICATION_TABLE).keepSynced(true)
         FirebaseDatabase.getInstance().getReference(AppConstant.READ_STATUS).keepSynced(true)
         FirebaseDatabase.getInstance().getReference(AppConstant.PENDING_MESSAGE_TABLE).keepSynced(true)
         FirebaseDatabase.getInstance().getReference(AppConstant.FRIEND_TABLE).keepSynced(true)
+        FirebaseDatabase.getInstance().getReference(AppConstant.INVITATION_TABLE).keepSynced(true)
 
 
        /* viewModel.getDataBaseReference().child(AppConstant.USER_TABLE).child(
@@ -82,12 +82,16 @@ class DashBoard : BaseFragment<FragmentDashBoardBinding, BaseViewModel>() {
         super.onPersistentViewCreated(view, savedInstanceState)
 
         viewModel.getFireBaseAuth().uid?.let { uid ->
+
+            Log.e("PrintUid","PrintUid -> $uid")
             viewModel.currentUserName(uid)
             viewModel.setToken(uid)
             viewModel.getDataBaseReference().child(AppConstant.USER_TABLE).child(uid).child(
                 AppConstant.USER_ONLINE).ref.setValue(true)
             viewModel.getDataBaseReference().child(AppConstant.USER_TABLE).child(uid).child(
                 AppConstant.USER_ONLINE).ref.onDisconnect().setValue(false)
+            viewModel.getDataBaseReference().child(AppConstant.USER_TABLE).child(uid).child(
+                AppConstant.LAST_SEEN).ref.onDisconnect().setValue(System.currentTimeMillis())
         }
     }
 }

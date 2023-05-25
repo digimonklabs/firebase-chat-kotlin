@@ -1,6 +1,7 @@
 package com.firebase.chat.koin
 
 import com.firebase.chat.base.BaseViewModel
+import com.firebase.chat.ui.viewmodel.AddFriendsViewModel
 import com.firebase.chat.ui.viewmodel.ChatDetailViewModel
 import com.firebase.chat.ui.viewmodel.ChatListViewModel
 import com.firebase.chat.ui.viewmodel.ForgotPasswordViewModel
@@ -30,6 +31,7 @@ val viewModelModule = module {
     viewModel { ChatListViewModel(get()) }
     viewModel { ChatDetailViewModel(get()) }
     viewModel { InvitationViewModel(get()) }
+    viewModel { AddFriendsViewModel(get()) }
 }
 val useCaseModule = module {
     factory { BaseUseCase(get(), get(), get()) }

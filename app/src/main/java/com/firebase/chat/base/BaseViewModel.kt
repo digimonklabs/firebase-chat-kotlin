@@ -1,13 +1,11 @@
 package com.firebase.chat.base
 
-import android.util.Log
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavDirections
-import com.firebase.chat.callback.OnSetAdapter
 import com.firebase.chat.navigation.NavigationCommand
 import com.mobisharnam.domain.util.AppConstant
 import com.firebase.chat.utils.Event
@@ -26,7 +24,7 @@ import java.util.Locale
 open class BaseViewModel(private val baseUseCase: BaseUseCase) : ViewModel() {
 
     val sendInvitationList = ObservableField(ArrayList<Invitation>())
-    val noFriend = ObservableBoolean(false)
+    val noFriend = ObservableBoolean(true)
     val existFriendList = ObservableField(ArrayList<String>())
     val invitationList = ObservableField(ArrayList<String>())
     val userChatList = ObservableField(ArrayList<NewUser>())
@@ -34,36 +32,6 @@ open class BaseViewModel(private val baseUseCase: BaseUseCase) : ViewModel() {
     val timeFormat = SimpleDateFormat("hh:mm a", Locale.ENGLISH)
     private val _navigation = MutableLiveData<Event<NavigationCommand>>()
     val navigation: LiveData<Event<NavigationCommand>> get() = _navigation
-
-    fun getAllUser(onSetAdapter: OnSetAdapter? = null) {
-        val userReference = getDataBaseReference().child("USerTable")
-        userReference.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                Log.e("PrintOnDataChangeAll","getAllUser method call")
-                if (snapshot.exists()) {
-                    for (sp in snapshot.children) {
-                        if (sp.key == getFireBaseAuth().uid) {
-                            sp.getValue(NewUser::class.java)?.let {
-                                existFriendList.set(it.friendsList)
-                                invitationList.set(it.invitationList)
-                            }
-                        }else {
-                            sp.getValue(NewUser::class.java)?.let {
-                                userChatList.get()?.add(it)
-                            }
-                        }
-                    }
-                    existFriendList.get()?.isEmpty()?.let { noFriend.set(it) }
-                    onSetAdapter?.onSetAdapter(AppConstant.ADD_FRIENDS_ADAPTER)
-                    Log.e("getAllUser","existFriendList ->  ${existFriendList.get()?.size} invitationList ->  ${invitationList.get()?.size} userChatList ->  ${userChatList.get()?.size}")
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-
-            }
-        })
-    }
 
     fun navigate(navDirections: NavDirections) {
         _navigation.value = Event(NavigationCommand.ToDirection(navDirections))

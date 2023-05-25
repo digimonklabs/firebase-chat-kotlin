@@ -27,10 +27,8 @@ import com.mobisharnam.domain.model.firebasedb.NewChatModel
 import com.mobisharnam.domain.util.AppConstant
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnSetAdapter,
-    OnAdapterChange {
+class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnSetAdapter {
 
-    private val chatList = ArrayList<NewChatModel>()
     private val friendsList = ArrayList<Friends>()
     var searchString = ""
     override val layoutId: Int
@@ -43,7 +41,7 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnS
             if (!it) {
 //                launchNotificationPermission()
             } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-                launchNotificationPermission()
+               // launchNotificationPermission()
             } else {
                 val intent = Intent()
                 intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
@@ -73,7 +71,6 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnS
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-      //  viewModel.getAllUser()
         viewModel.getFriends(this)
 
     }
@@ -82,7 +79,6 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnS
         super.onPersistentViewCreated(view, savedInstanceState)
 
         AppConstant.isRead = false
-        viewModel.initUserChat(this,this)
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object :
             OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -113,34 +109,14 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>(), OnS
         })
     }
 
-    fun onAddFriend() {
+    fun onAddFriend(view: View) {
+        Log.e("onAddFriend","onAddFriend")
         viewModel.navigate(ChattingDirections.addUserToChattingFragment())
     }
 
-    var check = true
     override fun onSetAdapter(adapter: String) {
         friendsList.clear()
         friendsList.addAll(viewModel.friendList)
         binding.adapter?.notifyDataSetChanged()
-    }
-
-    override fun onAdapterChange(position: Int, startPosition: Int, endPosition: Int) {
-       /* chatList.clear()
-        viewModel.chatList.get()?.let {
-            chatList.addAll(it)
-        }
-        if (position == -1) {
-            binding.adapter = ChatListAdapter(
-                this@Chatting.viewModel.userList.get()!!,
-                chatList,
-                this@Chatting.viewModel
-            )
-        }else {
-            binding.adapter?.notifyItemChanged(position)
-        }
-        if (startPosition != -1 && endPosition != -1) {
-            binding.adapter?.notifyItemRangeChanged(startPosition,endPosition)
-        }*/
-        Log.e("PrintPOsitions","position ->  $position - $startPosition - $endPosition")
     }
 }

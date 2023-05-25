@@ -5,37 +5,39 @@ import android.view.View
 import android.widget.SearchView
 import com.firebase.chat.R
 import com.firebase.chat.base.BaseFragment
-import com.firebase.chat.callback.OnSetAdapter
 import com.firebase.chat.databinding.FragmentAddUserBinding
 import com.firebase.chat.ui.adapter.AddFriendsAdapter
-import com.firebase.chat.ui.viewmodel.ChatListViewModel
-import com.mobisharnam.domain.util.AppConstant
+import com.firebase.chat.ui.viewmodel.AddFriendsViewModel
+import com.firebase.chat.utils.Extension.toast
+import com.mobisharnam.domain.model.firebasedb.NewUser
+import com.mobisharnam.domain.response.Response
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class AddUser : BaseFragment<FragmentAddUserBinding, ChatListViewModel>(), OnSetAdapter {
+class AddUser : BaseFragment<FragmentAddUserBinding, AddFriendsViewModel>() {
 
+    private val userList = ArrayList<NewUser>()
     private var searchString = ""
     override val layoutId: Int
         get() = R.layout.fragment_add_user
-    override val viewModel: ChatListViewModel by viewModel()
+    override val viewModel: AddFriendsViewModel by viewModel()
 
     override fun setVariable() {
         binding.apply {
             viewModel = this@AddUser.viewModel
             addUser = this@AddUser
-            adapter = AddFriendsAdapter(this@AddUser.viewModel.userChatList.get()!!,this@AddUser.viewModel,this@AddUser.viewModel.existFriendList.get()!!)
+            adapter = AddFriendsAdapter(userList, this@AddUser.viewModel)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.getAllUser(this)
+        viewModel.getAllUser()
     }
 
     override fun onPersistentViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onPersistentViewCreated(view, savedInstanceState)
 
-       // viewModel.init(this)
+        setUpFriendsObserver()
 
         binding.searchFriend.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
@@ -54,14 +56,32 @@ class AddUser : BaseFragment<FragmentAddUserBinding, ChatListViewModel>(), OnSet
         })
     }
 
-    fun onAddClick() {
-        viewModel.sendInvitation()
+    private fun setUpFriendsObserver() {
+        viewModel.friendsLiveData.observe(viewLifecycleOwner) { response ->
+            response.getContentIfNotHandled()?.let { user ->
+                when (user.status) {
+                    Response.Status.SUCCESS -> {
+                        userList.clear()
+                        user.data?.let {
+                            userList.addAll(it)
+                            binding.adapter?.addItem(it)
+                        }
+                        binding.adapter?.notifyItemRangeChanged(0,userList.size - 1)
+                    }
+
+                    Response.Status.ERROR -> {
+                        mContext.toast(user.message.toString())
+                    }
+
+                    Response.Status.EXCEPTION -> {
+                        mContext.toast(user.message.toString())
+                    }
+                }
+            }
+        }
     }
 
-    override fun onSetAdapter(adapter: String) {
-        if (adapter == AppConstant.ADD_FRIENDS_ADAPTER) {
-            binding.adapter?.addItem(viewModel.userChatList.get()!!)
-            binding.adapter?.notifyDataSetChanged()
-        }
+    fun onAddClick() {
+        viewModel.sendInvitation()
     }
 }

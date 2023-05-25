@@ -13,8 +13,9 @@ class NewUser(
     val friendsList: ArrayList<String>,
     val invitationList: ArrayList<String>,
     val token: String,
-    val notificationId: Int
+    val notificationId: Int,
+    val lastSeen: Long
 ) : Parcelable {
 
-    constructor() : this( "","", "", 0,0, false, ArrayList(), ArrayList(),"",0)
+    constructor() : this( "","", "", 0,0, false, ArrayList(), ArrayList(),"",0,System.currentTimeMillis())
 }

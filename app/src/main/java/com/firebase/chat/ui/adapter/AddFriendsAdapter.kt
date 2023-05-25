@@ -1,9 +1,11 @@
 package com.firebase.chat.ui.adapter
 
+import android.util.Log
 import com.daily.quotes.base.BaseAdapters
 import com.daily.quotes.base.BaseViewHolder
 import com.firebase.chat.R
 import com.firebase.chat.databinding.ItemAddFriendsBinding
+import com.firebase.chat.ui.viewmodel.AddFriendsViewModel
 import com.firebase.chat.ui.viewmodel.ChatListViewModel
 import com.mobisharnam.domain.model.Invitation
 import com.mobisharnam.domain.model.firebasedb.NewUser
@@ -12,9 +14,8 @@ import org.json.JSONException
 
 class AddFriendsAdapter(
     private val userModel: ArrayList<NewUser>,
-    viewModel: ChatListViewModel,
-    private val uid: ArrayList<String>
-) : BaseAdapters<ItemAddFriendsBinding, ChatListViewModel, NewUser>(userModel, viewModel) {
+    viewModel: AddFriendsViewModel
+) : BaseAdapters<ItemAddFriendsBinding, AddFriendsViewModel, NewUser>(userModel, viewModel) {
 
     private val allUserList: java.util.ArrayList<NewUser> =
         java.util.ArrayList<NewUser>()
@@ -35,8 +36,9 @@ class AddFriendsAdapter(
         item: NewUser,
         position: Int,
         holder: BaseViewHolder<ItemAddFriendsBinding>,
-        viewModel: ChatListViewModel
+        viewModel: AddFriendsViewModel
     ) {
+        Log.e("PrintINAdapter","user.data -> ${item.userName}")
         binding.apply {
             userModel = item
         }

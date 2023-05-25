@@ -5,13 +5,15 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="addUser"
             type="com.firebase.chat.ui.fragment.AddUser" />
 
         <variable
             name="viewModel"
-            type="com.firebase.chat.ui.viewmodel.ChatListViewModel" />
+            type="com.firebase.chat.ui.viewmodel.AddFriendsViewModel" />
 
         <variable
             name="adapter"
@@ -35,9 +37,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/sw_10sp"
-            android:tint="@color/white"
             android:onClick="@{ () -> viewModel.navigateBack()}"
             android:src="@drawable/ic_back_arrow"
+            android:tint="@color/white"
             app:layout_constraintBottom_toBottomOf="@+id/header"
             app:layout_constraintStart_toStartOf="@+id/header"
             app:layout_constraintTop_toTopOf="@+id/header" />
@@ -46,12 +48,12 @@
             android:layout_width="@dimen/sw_0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/sw_10sp"
+            android:ellipsize="end"
+            android:singleLine="true"
             android:text="@string/add_friends"
+            android:textColor="@color/white"
             android:textSize="@dimen/sw_18sp"
             android:textStyle="bold"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="@+id/ivBack"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/ivBack"
@@ -59,6 +61,9 @@
 
         <SearchView
             android:id="@+id/searchFriend"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/sw_40dp"
+            android:layout_marginHorizontal="@dimen/sw_20dp"
             android:layout_marginTop="@dimen/sw_10sp"
             android:background="@drawable/bg_searchview"
             android:focusable="false"
@@ -67,10 +72,19 @@
             android:searchHintIcon="@drawable/ic_search_black_24dp"
             android:searchIcon="@drawable/ic_search_black_24dp"
             android:theme="@style/MySearchViewStyle"
-            android:layout_marginHorizontal="@dimen/sw_20dp"
+            app:layout_constraintTop_toBottomOf="@+id/header" />
+
+        <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="match_parent"
-            app:layout_constraintTop_toBottomOf="@+id/header"
-            android:layout_height="@dimen/sw_40dp" />
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/sw_20dp"
+            android:gravity="center"
+            android:text="@string/no_user_found"
+            android:textColor="@color/black"
+            android:textSize="@dimen/sw_14sp"
+            android:visibility="@{viewModel.noUser ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toTopOf="@+id/btnAddFriend"
+            app:layout_constraintTop_toBottomOf="@+id/searchFriend" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
@@ -78,6 +92,7 @@
             android:layout_marginVertical="@dimen/sw_10sp"
             android:adapter="@{adapter}"
             android:orientation="vertical"
+            android:visibility="@{viewModel.noUser ? View.GONE : View.VISIBLE}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toTopOf="@+id/btnAddFriend"
             app:layout_constraintTop_toBottomOf="@+id/searchFriend" />
@@ -89,14 +104,15 @@
             android:layout_marginHorizontal="@dimen/sw_20dp"
             android:layout_marginTop="@dimen/sw_10dp"
             android:layout_marginBottom="@dimen/sw_10sp"
-            app:icon="@android:drawable/ic_input_add"
-            app:iconGravity="textStart"
+            android:enabled="@{!viewModel.noUser}"
             android:onClick="@{ (v) -> addUser.onAddClick()}"
             android:paddingVertical="@dimen/sw_10dp"
             android:text="@string/add"
             android:textColor="@color/white"
             android:textSize="@dimen/sw_14sp"
             app:cornerRadius="@dimen/sw_6dp"
+            app:icon="@android:drawable/ic_input_add"
+            app:iconGravity="textStart"
             app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

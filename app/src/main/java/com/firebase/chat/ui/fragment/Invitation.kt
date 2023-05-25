@@ -1,49 +1,60 @@
 package com.firebase.chat.ui.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import com.firebase.chat.R
 import com.firebase.chat.base.BaseFragment
-import com.firebase.chat.callback.OnSetAdapter
 import com.firebase.chat.databinding.FragmentInvitationBinding
 import com.firebase.chat.ui.adapter.InvitationAdapter
 import com.firebase.chat.ui.viewmodel.InvitationViewModel
-import com.mobisharnam.domain.model.firebasedb.NewUser
-import com.mobisharnam.domain.util.AppConstant
+import com.firebase.chat.utils.Extension.toast
+import com.mobisharnam.domain.model.Invitation
+import com.mobisharnam.domain.response.Response
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class Invitation : BaseFragment<FragmentInvitationBinding, InvitationViewModel>(), OnSetAdapter {
+class Invitation : BaseFragment<FragmentInvitationBinding, InvitationViewModel>() {
 
-    private val userList = ArrayList<NewUser>()
+    private val userList = ArrayList<Invitation>()
     override val layoutId: Int
         get() = R.layout.fragment_invitation
     override val viewModel: InvitationViewModel by viewModel()
 
     override fun setVariable() {
         binding.apply {
-           invitationViewModel = viewModel
+            invitationViewModel = viewModel
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        viewModel.getInvitation()
     }
 
     override fun onPersistentViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onPersistentViewCreated(view, savedInstanceState)
 
-        viewModel.getInvitation(this)
+        setUpInvitationObserver()
     }
 
-    override fun onSetAdapter(adapter: String) {
-        if (adapter == AppConstant.INVITATION_ADAPTER) {
-            viewModel.invitations.get()?.let {
-                userList.clear()
-                Log.e("Invitation","onSetAdapter call")
-                userList.addAll(it)
-                binding.rvInvitations.visibility = if (userList.isEmpty()) {
-                    View.GONE
-                } else {
-                    View.VISIBLE
+    private fun setUpInvitationObserver() {
+        viewModel.invitationLiveData.observe(viewLifecycleOwner) { response ->
+            response.getContentIfNotHandled()?.let { invitation ->
+                when (invitation.status) {
+                    Response.Status.SUCCESS -> {
+                        userList.clear()
+                        invitation.data?.let { userList.addAll(it) }
+                        binding.adapter = InvitationAdapter(userList, viewModel)
+                    }
+
+                    Response.Status.ERROR -> {
+                        mContext.toast(invitation.message.toString())
+                    }
+
+                    Response.Status.EXCEPTION -> {
+                        mContext.toast(invitation.message.toString())
+                    }
                 }
-                binding.adapter = InvitationAdapter(userList,viewModel)
             }
         }
     }

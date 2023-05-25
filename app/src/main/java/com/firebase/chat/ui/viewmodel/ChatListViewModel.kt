@@ -25,98 +25,6 @@ class ChatListViewModel(private val chatListUseCase: ChatListUseCase) :
     //    val noFriend = ObservableBoolean(false)
     var userList = ObservableField(ArrayList<NewUser>())
     var friendList = ArrayList<Friends>()
-    var isUpdate = true
-    val chatUser = ArrayList<String>()
-
-    fun initUserChat(onSetAdapter: OnSetAdapter,onAdapterChange: OnAdapterChange) {
-        val chatReference = getDataBaseReference().child(AppConstant.CHAT_TABLE)
-        chatReference.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val chat = ArrayList<NewChatModel>()
-                val chatId = ArrayList<String>()
-
-                Log.e("initUserChat", "initUserChat")
-                for (ds in snapshot.children) {
-                    Log.e("initUserChat", "initUserChat in loop")
-                    if (ds.key!!.contains(getFireBaseAuth().uid.toString())) {
-                        ds.key?.let {
-                            chatId.add(it)
-                        }
-                        /*chatReference.child(ds.key.toString()).orderByKey().limitToLast(1).addChildEventListener(object :ChildEventListener {
-                            override fun onChildAdded(
-                                snapshot: DataSnapshot,
-                                previousChildName: String?
-                            ) {
-                                Log.e("ChildEventListener","onChildAdded ${ds.key} -- ${snapshot.key}")
-                                snapshot.getValue(NewChatModel::class.java)?.let {
-                                    chat.add(it)
-                                }
-                                chatList.set(ArrayList())
-                                chatList.set(chat)
-                                onSetAdapter.onSetAdapter(AppConstant.CHAT_ADAPTER)
-                            }
-
-                            override fun onChildChanged(
-                                snapshot: DataSnapshot,
-                                previousChildName: String?
-                            ) {
-                                Log.e("ChildEventListener","onChildChanged")
-
-                            }
-
-                            override fun onChildRemoved(snapshot: DataSnapshot) {
-
-                            }
-
-                            override fun onChildMoved(
-                                snapshot: DataSnapshot,
-                                previousChildName: String?
-                            ) {
-
-
-                            }
-
-                            override fun onCancelled(error: DatabaseError) {
-
-                            }
-
-                        })*/
-                        /*chatReference.child(ds.key.toString()).orderByKey().limitToLast(1).addListenerForSingleValueEvent(object : ValueEventListener {
-                            override fun onDataChange(snapshot: DataSnapshot) {
-                                for (sp in snapshot.children) {
-                                    sp.getValue(NewChatModel::class.java)?.let {
-                                        chat.add(it)
-                                    }
-                                }
-                                chatList.set(ArrayList())
-                                chatList.set(chat)
-                                Log.e("PrintForLoop","Loop id is  ->  ${ds.key} ")
-                                Log.e("onSetAdapter","onSetAdapter ->  ${chatList.get()?.size} ")
-                                onSetAdapter.onSetAdapter(AppConstant.CHAT_ADAPTER)
-                            }
-
-                            override fun onCancelled(error: DatabaseError) {
-
-                            }
-                        })*/
-                    }
-                }
-                if (chatUser.size != chatId.size) {
-                    Log.e("getLatestMessage", "initUserChat in if")
-                    getLatestMessage(chatId, onAdapterChange,true)
-                }else {
-                    Log.e("getLatestMessage", "initUserChat in else")
-                    getLatestMessage(chatId, onAdapterChange,false)
-                }
-                chatUser.clear()
-                chatUser.addAll(chatId)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-
-            }
-        })
-    }
 
     fun getLatestMessage(chatId: ArrayList<String>, onAdapterChange: OnAdapterChange, isSingleCall: Boolean) {
         val chatReference = getDataBaseReference().child(AppConstant.CHAT_TABLE)
@@ -231,55 +139,20 @@ class ChatListViewModel(private val chatListUseCase: ChatListUseCase) :
         }
     }
 
-    fun sendInvitation() {
-        Log.e("sendInvitation","sendInvitation -> ${invitationList.get()?.size}")
-        getDataBaseReference().child("USerTable").child(getFireBaseAuth().uid.toString()).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val senderName = snapshot.getValue(NewUser::class.java)?.userName
-                sendInvitationList.get()?.forEach { friendUid ->
-                    val invitationReference = getDataBaseReference().child("Invitations").child(friendUid.senderId)
-                    invitationReference.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            if (snapshot.exists()) {
-                                for (sp in snapshot.children) {
-                                    sp.getValue<Invitation>()?.let {
-                                        Log.e("PrintSenderID"," id is  -> ${it.senderId}==${getFireBaseAuth().uid}")
-                                        if (it.senderId != getFireBaseAuth().uid) {
-                                            val invitation = Invitation(senderName = senderName ?: "", senderId = getFireBaseAuth().uid.toString())
-                                            invitationReference.setValue(invitation)
-                                        }
-                                    }
-                                }
-                            }else {
-                                Log.e("PrintSenderID"," id is  -> in else llopp")
-                                val invitation = Invitation(senderName = senderName ?: "", senderId = getFireBaseAuth().uid.toString())
-                                invitationReference.setValue(invitation)
-                            }
-                        }
-
-                        override fun onCancelled(error: DatabaseError) {
-
-                        }
-                    })
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-
-            }
-        })
-    }
-
     fun getFriends(onSetAdapter: OnSetAdapter) {
         val friendsReference = getDataBaseReference().child(AppConstant.FRIEND_TABLE).child(getFireBaseAuth().uid.toString())
         friendsReference.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                if (!snapshot.exists()) {
+                    noFriend.set(true)
+                }
                 snapshot.getValue<Friends>()?.let {
                     friendList.add(it)
                 }
                 friendList.sortByDescending {
                     it.dateTime
                 }
+                noFriend.set(friendList.isEmpty())
                 onSetAdapter.onSetAdapter("")
                 Log.e("getFriends","onChildAdded -> ${friendList.size}")
             }

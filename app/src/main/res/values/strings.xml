@@ -41,4 +41,10 @@
     <string name="alert_typing">Typing...</string>
     <string name="accept">Accept</string>
     <string name="denied">Denied</string>
+    <string name="no_user_found">No user found!</string>
+    <string name="no_invitation_found">You don\'t have any invitation.</string>
+
+    <string name="last_seen">last Seen</string>
+    <string name="last_seen_today">last Seen today</string>
+    <string name="last_seen_yesterday">last Seen yesterday</string>
 </resources>

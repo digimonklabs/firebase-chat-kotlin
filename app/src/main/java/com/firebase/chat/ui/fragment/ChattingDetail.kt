@@ -32,6 +32,7 @@ class ChattingDetail : BaseFragment<FragmentChatingDetailsBinding, ChatDetailVie
         override fun onFinish() {
             Log.e("onFinish", "onFinish")
             viewModel.setTyping(false,chatId)
+            viewModel.setTypingId(false,chatId)
         }
     }
 
@@ -46,9 +47,12 @@ class ChattingDetail : BaseFragment<FragmentChatingDetailsBinding, ChatDetailVie
     override fun onPersistentViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onPersistentViewCreated(view, savedInstanceState)
 
+        viewModel.allowRead.set(true)
         AppConstant.isRead = true
         chatId = navArgs.chatId
-//        viewModel.setMarkAsRead(chatId)
+
+        viewModel.setUserStatus(chatId)
+        viewModel.setTyping()
         viewModel.setMarkAsRead(chatId)
         viewModel.setSender(navArgs.userName)
         viewModel.clearNotification(chatId)
@@ -62,8 +66,11 @@ class ChattingDetail : BaseFragment<FragmentChatingDetailsBinding, ChatDetailVie
             it?.length?.let {
                 if (it <= 0) {
                     viewModel.setTyping(false, chatId)
+                    viewModel.setTypingId(false,chatId)
                 } else {
                     viewModel.setTyping(true, chatId)
+                    viewModel.setTypingId(false,chatId)
+                    viewModel.setTypingId(true,chatId)
                     timer.start()
                 }
             }
@@ -89,5 +96,10 @@ class ChattingDetail : BaseFragment<FragmentChatingDetailsBinding, ChatDetailVie
             binding.adapter?.notifyItemRangeChanged(0, viewModel.chatListModel.get()!!.size - 1)
             binding.rvChatList.scrollToPosition(viewModel.chatListModel.get()!!.size - 1)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.allowRead.set(false)
     }
 }

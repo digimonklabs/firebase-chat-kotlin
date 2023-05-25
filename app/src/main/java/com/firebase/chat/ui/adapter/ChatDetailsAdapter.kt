@@ -1,10 +1,14 @@
 package com.firebase.chat.ui.adapter
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.drawable.Icon
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.firebase.chat.R
 import com.firebase.chat.databinding.ReceiverChatLayoutBinding
 import com.firebase.chat.databinding.SenderChatLayoutBinding
 import com.firebase.chat.ui.viewmodel.ChatDetailViewModel
@@ -29,6 +33,11 @@ class ChatDetailsAdapter(
                 binding.tvDateTime.visibility = View.VISIBLE
                 binding.tvSenderMessage.text = chatModel.message
                 binding.tvDateTime.text = viewModel.getDateTime(chatModel.dateTime)
+                when(chatModel.status) {
+                    1 -> binding.readStatus.background = ContextCompat.getDrawable(context, R.drawable.ic_right)
+                    2 -> binding.readStatus.setImageIcon(Icon.createWithResource("",R.drawable.double_right_icon))
+                    3 -> binding.readStatus.setImageIcon(Icon.createWithResource("",R.drawable.double_right_r2ead_icon))
+                }
             } else {
                 binding.tvSenderMessage.visibility = View.GONE
                 binding.tvDateTime.visibility = View.GONE

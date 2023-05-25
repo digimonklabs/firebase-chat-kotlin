@@ -8,8 +8,9 @@ class ChatModel(
     val senderID: String,
     val message: String,
     val dateTime: Long,
-    val read: Boolean
+    val read: Boolean,
+    val status: Int
 ) : Parcelable {
 
-    constructor() : this("", "", "",0,false)
+    constructor() : this("", "", "",0,false,1)
 }
