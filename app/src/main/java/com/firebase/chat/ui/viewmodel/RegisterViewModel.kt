@@ -4,8 +4,13 @@ import android.util.Patterns
 import androidx.databinding.ObservableField
 import com.firebase.chat.R
 import com.firebase.chat.base.BaseViewModel
+import com.firebase.chat.ui.fragment.RegisterDirections
 import com.firebase.chat.utils.Extension.toast
+import com.google.firebase.auth.FirebaseUser
 import com.mobisharnam.domain.interacter.RegisterUseCase
+import com.mobisharnam.domain.model.firebasedb.NewUser
+import com.mobisharnam.domain.util.AppConstant
+import java.util.Random
 
 class RegisterViewModel(private val registerUseCase: RegisterUseCase): BaseViewModel(registerUseCase) {
 
@@ -32,6 +37,47 @@ class RegisterViewModel(private val registerUseCase: RegisterUseCase): BaseViewM
         }else {
             return true
         }
+    }
+
+    fun registerNewUser(user: FirebaseUser?) {
+        val userTable = NewUser(
+            uid = user?.uid ?: "",
+            userName = registerName.get().toString(),
+            userEmail = registerEmail.get().toString(),
+            created = System.currentTimeMillis(),
+            updated = System.currentTimeMillis(),
+            online = true,
+            friendsList = ArrayList(),
+            invitationList = ArrayList(),
+            token = "",
+            notificationId = Random().nextInt(5001),
+            lastSeen = System.currentTimeMillis()
+        )
+
+        getDataBaseReference().child(AppConstant.USER_TABLE).child(user!!.uid)
+            .setValue(userTable)
+            .addOnSuccessListener {
+                registerUseCase.getContext().toast(registerUseCase.getContext().getString(R.string.register_successfully))
+                user.uid.let {
+                    currentUserName(it)
+                    setToken(it)
+                    getDataBaseReference().child(AppConstant.USER_TABLE)
+                        .child(it).child(
+                            AppConstant.USER_ONLINE
+                        ).ref.setValue(true)
+                    getDataBaseReference().child(AppConstant.USER_TABLE)
+                        .child(it).child(
+                            AppConstant.USER_ONLINE
+                        ).ref.onDisconnect().setValue(false)
+                    getDataBaseReference().child(AppConstant.USER_TABLE)
+                        .child(it).child(
+                            AppConstant.LAST_SEEN
+                        ).ref.onDisconnect().setValue(System.currentTimeMillis())
+                }
+                navigate(RegisterDirections.registerToChattingFragment())
+            }.addOnFailureListener {
+                registerUseCase.getContext().toast(it.message.toString())
+            }
     }
 
     val registerEmail = ObservableField("")

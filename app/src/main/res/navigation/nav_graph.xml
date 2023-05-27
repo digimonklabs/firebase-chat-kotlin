@@ -91,6 +91,9 @@
         <argument
             android:name="userName"
             app:argType="string" />
+        <argument
+            android:name="token"
+            app:argType="string" />
 
     </fragment>
 

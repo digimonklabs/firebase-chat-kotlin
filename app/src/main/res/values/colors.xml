@@ -13,5 +13,5 @@
     <color name="colorSearchView">#E7E8EC</color>
 
     <color name="colorGreen">#268F00</color>
-    <color name="colorSimpleText">#808080</color>
+    <color name="colorLightRed">#FFEAEA</color>
 </resources>

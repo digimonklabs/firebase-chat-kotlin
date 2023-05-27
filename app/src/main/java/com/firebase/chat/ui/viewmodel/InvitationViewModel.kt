@@ -1,8 +1,10 @@
 package com.firebase.chat.ui.viewmodel
 
+import android.util.Log
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.firebase.chat.base.BaseViewModel
 import com.firebase.chat.utils.Event
 import com.google.firebase.database.DataSnapshot
@@ -15,6 +17,9 @@ import com.mobisharnam.domain.model.Invitation
 import com.mobisharnam.domain.model.firebasedb.NewUser
 import com.mobisharnam.domain.response.Response
 import com.mobisharnam.domain.util.AppConstant
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import java.util.Random
 
 class InvitationViewModel(private val invitationUseCase: InvitationUseCase) :
     BaseViewModel(invitationUseCase) {
@@ -25,7 +30,24 @@ class InvitationViewModel(private val invitationUseCase: InvitationUseCase) :
         get() = _invitationLiveData
 
     fun getInvitation() {
-        val invitationReference = getDataBaseReference().child(AppConstant.INVITATION_TABLE)
+
+        viewModelScope.launch {
+            val users = invitationUseCase.getInvitation()
+            users.collect {
+                when(it.status) {
+                    Response.Status.SUCCESS -> {
+                        _invitationLiveData.postValue(Event(Response.success(it.data,it.errorCode)))
+                    }
+                    Response.Status.ERROR -> {
+                        _invitationLiveData.postValue(Event(Response.exception(it.message.toString(),it.errorCode)))
+                    }
+                    Response.Status.EXCEPTION -> {
+                        _invitationLiveData.postValue(Event(Response.exception(it.message.toString(),it.errorCode)))
+                    }
+                }
+            }
+        }
+        /*val invitationReference = getDataBaseReference().child(AppConstant.INVITATION_TABLE)
             .child(getFireBaseAuth().uid.toString())
         invitationReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -50,7 +72,7 @@ class InvitationViewModel(private val invitationUseCase: InvitationUseCase) :
                     )
                 )
             }
-        })
+        })*/
     }
 
     fun acceptInvitation(uid: String, accept: Boolean) {
@@ -70,7 +92,9 @@ class InvitationViewModel(private val invitationUseCase: InvitationUseCase) :
                                 typingId = "",
                                 pendingCount = 0,
                                 lastMessage = "",
-                                dateTime = System.currentTimeMillis()
+                                dateTime = System.currentTimeMillis(),
+                                token = it.token,
+                                notificationId = Random().nextInt(999999)
                             )
                             friendsReference.setValue(friend)
                         }
@@ -96,7 +120,9 @@ class InvitationViewModel(private val invitationUseCase: InvitationUseCase) :
                                 typingId = "",
                                 pendingCount = 0,
                                 lastMessage = "",
-                                dateTime = System.currentTimeMillis()
+                                dateTime = System.currentTimeMillis(),
+                                token = it.token,
+                                notificationId = Random().nextInt(999999)
                             )
                             friendsReference.setValue(friend)
                         }

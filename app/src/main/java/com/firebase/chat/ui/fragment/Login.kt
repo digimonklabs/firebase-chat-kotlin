@@ -1,14 +1,12 @@
 package com.firebase.chat.ui.fragment
 
-import android.os.Bundle
-import android.view.View
 import com.firebase.chat.R
 import com.firebase.chat.base.BaseFragment
 import com.firebase.chat.databinding.FragmentLoginBinding
 import com.firebase.chat.ui.viewmodel.LoginViewModel
-import com.mobisharnam.domain.util.AppConstant
 import com.firebase.chat.utils.Extension.toast
 import com.google.firebase.auth.FirebaseAuthException
+import com.mobisharnam.domain.util.AppConstant
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class Login : BaseFragment<FragmentLoginBinding, LoginViewModel>() {
@@ -24,14 +22,10 @@ class Login : BaseFragment<FragmentLoginBinding, LoginViewModel>() {
         }
     }
 
-    override fun onPersistentViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onPersistentViewCreated(view, savedInstanceState)
-
-    }
-
     fun onRegisterClick() {
         viewModel.navigate(LoginDirections.loginToRegisterFragment())
     }
+
     fun onLoginClick() {
         val firebaseAuth = viewModel.getFireBaseAuth()
         firebaseAuth.signInWithEmailAndPassword(
@@ -45,13 +39,15 @@ class Login : BaseFragment<FragmentLoginBinding, LoginViewModel>() {
                     viewModel.currentUserName(it)
                     viewModel.setToken(it)
                     viewModel.getDataBaseReference().child(AppConstant.USER_TABLE).child(it).child(
-                        AppConstant.USER_ONLINE).ref.setValue(true)
+                        AppConstant.USER_ONLINE
+                    ).ref.setValue(true)
                     viewModel.getDataBaseReference().child(AppConstant.USER_TABLE).child(it).child(
-                        AppConstant.USER_ONLINE).ref.onDisconnect().setValue(false)
+                        AppConstant.USER_ONLINE
+                    ).ref.onDisconnect().setValue(false)
 
                 }
                 viewModel.navigate(LoginDirections.loginToChattingFragment())
-            }else {
+            } else {
                 val errorCode = (task.exception as FirebaseAuthException?)!!.errorCode
                 if (errorCode == AppConstant.ERROR_USER_NOT_FOUND) {
                     mContext.toast(getString(R.string.user_does_not_exist))
@@ -61,9 +57,11 @@ class Login : BaseFragment<FragmentLoginBinding, LoginViewModel>() {
             }
         }
     }
+
     fun onLoginGoogleClick() {
 
     }
+
     fun onForgotPasswordClick() {
         viewModel.navigate(LoginDirections.loginToForgotPasswordFragment())
     }

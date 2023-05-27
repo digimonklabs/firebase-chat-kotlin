@@ -85,8 +85,9 @@ class UserListAdapter(
             viewModel.navigate(
                 ChattingDirections.chattingToChattingDetailFragment(
                     item.chatId,
-                    0,
+                    item.notificationId,
                     item.name,
+                    item.token,
                 )
             )
         }

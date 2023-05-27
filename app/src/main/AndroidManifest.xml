@@ -37,6 +37,16 @@
             </intent-filter>
         </service>
 
+        <receiver
+            android:name=".utils.ReplayNotification"
+            android:enabled="true"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="REPLY_ACTION" />
+                <action android:name="MARK_AS_READ_ACTION" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
