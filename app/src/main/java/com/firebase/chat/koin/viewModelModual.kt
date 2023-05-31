@@ -11,6 +11,7 @@ import com.firebase.chat.ui.viewmodel.RegisterViewModel
 import com.mobisharnam.data.repository.LocalRepositoryImpl
 import com.mobisharnam.data.repository.RemoteRepositoryImpl
 import com.mobisharnam.data.source.remote.api.RestClient
+import com.mobisharnam.domain.interacter.AddUserUseCase
 import com.mobisharnam.domain.interacter.BaseUseCase
 import com.mobisharnam.domain.interacter.ChatDetailUseCase
 import com.mobisharnam.domain.interacter.ChatListUseCase
@@ -41,6 +42,7 @@ val useCaseModule = module {
     factory { ChatListUseCase(get(), get(), get()) }
     factory { ChatDetailUseCase(get(), get(), get()) }
     factory { InvitationUseCase(get(), get(), get()) }
+    factory { AddUserUseCase(get(), get(), get()) }
 }
 val repositoryModule = module {
     factory<RemoteRepository> { RemoteRepositoryImpl(get()) }

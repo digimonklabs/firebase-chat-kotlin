@@ -24,7 +24,6 @@ class Register : BaseFragment<FragmentRegisterBinding, RegisterViewModel>() {
     }
 
     fun onRegisterClick() {
-        val rootReferences = viewModel.getDataBaseReference()
         val isValid = viewModel.checkValidation()
         if (isValid) {
             val firebaseAuth = viewModel.getFireBaseAuth()

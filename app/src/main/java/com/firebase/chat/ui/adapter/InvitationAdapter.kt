@@ -28,7 +28,7 @@ class InvitationAdapter(
                 val name = item.senderName.split(" ")
                 ivUserImage.text = name[0][0] + name[1][0].toString()
             } catch (e: Exception) {
-                ivUserImage.text = item.senderName[0].toString()
+                ivUserImage.text = item.senderName.first().toString()
             }
 
             btnAccept.setOnClickListener {

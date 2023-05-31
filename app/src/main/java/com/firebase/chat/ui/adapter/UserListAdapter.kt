@@ -44,7 +44,7 @@ class UserListAdapter(
         holder: BaseViewHolder<ItemChattingListBinding>,
         viewModel: ChatListViewModel
     ) {
-        Log.e("PrintOnBind", "PrintOnBind ${item.lastMessage} ${item.chatId}")
+        Log.e("PrintOnBind", "PrintOnBind ${item.pendingCount} ${item.chatId}")
         binding.apply {
             tvUserName.text = item.name
             tvLastMessage.text = item.lastMessage

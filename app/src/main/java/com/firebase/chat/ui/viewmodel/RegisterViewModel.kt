@@ -14,6 +14,10 @@ import java.util.Random
 
 class RegisterViewModel(private val registerUseCase: RegisterUseCase): BaseViewModel(registerUseCase) {
 
+    val registerEmail = ObservableField("")
+    val registerName = ObservableField("")
+    val registerPassword = ObservableField("")
+
     fun checkValidation(): Boolean {
         val email = registerEmail.get()
         val name = registerName.get()
@@ -79,8 +83,4 @@ class RegisterViewModel(private val registerUseCase: RegisterUseCase): BaseViewM
                 registerUseCase.getContext().toast(it.message.toString())
             }
     }
-
-    val registerEmail = ObservableField("")
-    val registerName = ObservableField("")
-    val registerPassword = ObservableField("")
 }

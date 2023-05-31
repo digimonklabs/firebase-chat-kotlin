@@ -108,12 +108,12 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>() {
     }
 
     private fun setUpObserver() {
-        viewModel.friendsLiveData.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled()?.let {
-                when (it.status) {
+        viewModel.friendsLiveData.observe(viewLifecycleOwner) { response ->
+            response.getContentIfNotHandled()?.let { friendData ->
+                when (friendData.status) {
                     Response.Status.SUCCESS -> {
                         friendsList.clear()
-                        it.data?.let { friend ->
+                        friendData.data?.let { friend ->
                             friendsList.addAll(friend)
                             viewModel.noFriend.set(friend.isEmpty())
                         }
@@ -121,13 +121,13 @@ class Chatting : BaseFragment<FragmentChattingBinding, ChatListViewModel>() {
                     }
 
                     Response.Status.ERROR -> {
-                        if (it.message == AppConstant.NO_FRIEND) {
+                        if (friendData.message == AppConstant.NO_FRIEND) {
                             viewModel.noFriend.set(true)
                         }
                     }
 
                     Response.Status.EXCEPTION -> {
-                        it.message?.let { mContext.toast(it) }
+                        friendData.message?.let { mContext.toast(it) }
                     }
                 }
             }

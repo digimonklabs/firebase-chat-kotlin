@@ -1,6 +1,7 @@
 package com.mobisharnam.domain.interacter
 
 import android.content.Context
+import android.util.Log
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -25,6 +26,7 @@ class ChatListUseCase(
             .child(getFireBaseAuth().uid.toString())
         friendsReference.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                Log.e("PrintChatListCall","PrintChatListCall done in onChildAdded")
                 if (snapshot.exists()) {
                     snapshot.getValue<Friends>()?.let {
                         friendList.add(it)
@@ -39,6 +41,7 @@ class ChatListUseCase(
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                Log.e("PrintChatListCall","PrintChatListCall done in onChildChanged")
                 snapshot.getValue<Friends>()?.let {
                     for (i in 0 until friendList.size) {
                         if (it.chatId == friendList[i].chatId) {

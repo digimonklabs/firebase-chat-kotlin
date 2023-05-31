@@ -1,5 +1,8 @@
 package com.firebase.chat.ui.fragment
 
+import android.os.Bundle
+import android.view.View
+import androidx.activity.OnBackPressedCallback
 import com.firebase.chat.R
 import com.firebase.chat.base.BaseFragment
 import com.firebase.chat.databinding.FragmentLoginBinding
@@ -20,6 +23,16 @@ class Login : BaseFragment<FragmentLoginBinding, LoginViewModel>() {
             login = this@Login
             viewModel = this@Login.viewModel
         }
+    }
+
+    override fun onPersistentViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onPersistentViewCreated(view, savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object :
+            OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                requireActivity().finishAffinity()
+            }
+        })
     }
 
     fun onRegisterClick() {

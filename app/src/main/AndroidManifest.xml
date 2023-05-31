@@ -41,10 +41,20 @@
             android:name=".utils.ReplayNotification"
             android:enabled="true"
             android:exported="false" >
-            <intent-filter>
+           <!-- <intent-filter>
                 <action android:name="REPLY_ACTION" />
                 <action android:name="MARK_AS_READ_ACTION" />
-            </intent-filter>
+            </intent-filter>-->
+        </receiver>
+
+        <receiver
+            android:name=".utils.MarkAsReadNotification"
+            android:enabled="true"
+            android:exported="false" >
+           <!-- <intent-filter>
+                <action android:name="REPLY_ACTION" />
+                <action android:name="MARK_AS_READ_ACTION" />
+            </intent-filter>-->
         </receiver>
 
     </application>

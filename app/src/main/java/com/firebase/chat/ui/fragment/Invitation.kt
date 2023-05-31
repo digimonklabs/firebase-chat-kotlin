@@ -43,7 +43,10 @@ class Invitation : BaseFragment<FragmentInvitationBinding, InvitationViewModel>(
                 when (invitation.status) {
                     Response.Status.SUCCESS -> {
                         userList.clear()
-                        invitation.data?.let { userList.addAll(it) }
+                        invitation.data?.let { invitationList ->
+                            viewModel.noInvitation.set(invitationList.isEmpty())
+                            userList.addAll(invitationList)
+                        }
                         binding.adapter = InvitationAdapter(userList, viewModel)
                     }
 

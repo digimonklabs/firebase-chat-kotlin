@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.RemoteInput
 import com.firebase.chat.R
 import com.firebase.chat.ui.activity.MainActivity
+import com.firebase.chat.utils.MarkAsReadNotification
 import com.firebase.chat.utils.ReplayNotification
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -35,13 +36,16 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
         super.onMessageReceived(message)
 
         val notificationId = message.data[AppConstant.NOTIFICATION_ID]
+        val receiverNotificationId = message.data[AppConstant.RECEIVER_NOTIFICATION_ID]
         val notificationChatId = message.data[AppConstant.CHAT_ID]
+        val userToken = message.data[AppConstant.USER_TOKEN]
+        val friendToken = message.data[AppConstant.FRIEND_TOKEN]
         AppConstant.notificationID = notificationId?.toInt() ?: 0
-        Log.e("PrintRemoteMessage","onMessageReceived -> $notificationChatId ")
+        Log.e("PrintRemoteMessage","onMessageReceived ->  $notificationId ")
         Log.e("RemoteMessage","RemoteMessage ->")
 
         val intent = Intent(this, MainActivity::class.java)
-
+        intent.putExtra(AppConstant.IS_FROM_CHAT,true)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         val pendingIntent =  PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_MUTABLE)
         val channelId = "ChatChannel"
@@ -56,9 +60,11 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
         }
 
         val replayIntent = Intent(this, ReplayNotification::class.java)
-        replayIntent.action = "REPLY_ACTION"
-        replayIntent.putExtra(REQUEST_CODE_REPLAY,REQUEST_CODE_REPLAY)
+        replayIntent.putExtra(AppConstant.FRIEND_TOKEN,friendToken)
+        replayIntent.putExtra(AppConstant.USER_TOKEN,userToken)
         replayIntent.putExtra(AppConstant.CHAT_ID,notificationChatId)
+        replayIntent.putExtra(AppConstant.NOTIFICATION_ID,notificationId)
+        replayIntent.putExtra(AppConstant.RECEIVER_NOTIFICATION_ID,receiverNotificationId)
 
         val replayPendingIntent = PendingIntent.getBroadcast(
             this,
@@ -76,9 +82,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
             .addRemoteInput(remoteInput)
             .build()
 
-        val markAsReadIntent = Intent(this, ReplayNotification::class.java)
-        markAsReadIntent.action = "MARK_AS_READ_ACTION"
-        markAsReadIntent.putExtra(REQUEST_CODE_MARK_AS_READ,REQUEST_CODE_MARK_AS_READ)
+        val markAsReadIntent = Intent(this, MarkAsReadNotification::class.java)
         markAsReadIntent.putExtra(AppConstant.CHAT_ID,notificationChatId)
         markAsReadIntent.putExtra(AppConstant.NOTIFICATION_ID,notificationId)
 

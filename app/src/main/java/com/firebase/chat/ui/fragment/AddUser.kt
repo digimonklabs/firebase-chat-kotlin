@@ -58,23 +58,24 @@ class AddUser : BaseFragment<FragmentAddUserBinding, AddFriendsViewModel>() {
 
     private fun setUpFriendsObserver() {
         viewModel.friendsLiveData.observe(viewLifecycleOwner) { response ->
-            response.getContentIfNotHandled()?.let { user ->
-                when (user.status) {
+            response.getContentIfNotHandled()?.let { userData ->
+                when (userData.status) {
                     Response.Status.SUCCESS -> {
                         userList.clear()
-                        user.data?.let {
-                            userList.addAll(it)
-                            binding.adapter?.addItem(it)
+                        userData.data?.let { user ->
+                            viewModel.noUser.set(user.isEmpty())
+                            userList.addAll(user)
+                            binding.adapter?.addItem(user)
                         }
                         binding.adapter?.notifyItemRangeChanged(0,userList.size - 1)
                     }
 
                     Response.Status.ERROR -> {
-                        mContext.toast(user.message.toString())
+                        mContext.toast(userData.message.toString())
                     }
 
                     Response.Status.EXCEPTION -> {
-                        mContext.toast(user.message.toString())
+                        mContext.toast(userData.message.toString())
                     }
                 }
             }

@@ -1,5 +1,6 @@
 package com.firebase.chat.ui.activity
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -15,10 +16,12 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import com.firebase.chat.R
 import com.firebase.chat.base.BaseViewModel
 import com.firebase.chat.databinding.ActivityMainBinding
+import com.firebase.chat.ui.fragment.ChattingDirections
 import com.firebase.chat.ui.viewmodel.ChatDetailViewModel
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.database.DataSnapshot
@@ -41,6 +44,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val isFromNotification = intent.getBooleanExtra(AppConstant.IS_FROM_CHAT,false)
+
         binding.navView.getHeaderView(0).findViewById<ImageView>(R.id.back).setOnClickListener {
             onCloseDrawer()
         }
@@ -48,6 +53,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container) as NavHostFragment
         navController = navHostFragment.navController
+
+       /* if (isFromNotification) {
+            val bundle = Bundle()
+            bundle.putString("","")
+            navController.navigate(R.id.chatDetailFragment)
+        }*/
+
         navController.addOnDestinationChangedListener { _, destination, _ ->
             currentDestination = destination
             when (destination.id) {
@@ -121,7 +133,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             }
             R.id.action_logout -> {
-
+                viewModel.getFireBaseAuth().signOut()
+                navController.navigate(R.id.loginFragment)
             }
         }
         onCloseDrawer()

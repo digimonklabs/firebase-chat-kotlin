@@ -11,19 +11,12 @@ import androidx.lifecycle.viewModelScope
 import com.firebase.chat.R
 import com.firebase.chat.base.BaseViewModel
 import com.firebase.chat.utils.Event
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.getValue
 import com.google.firebase.messaging.FirebaseMessaging
 import com.mobisharnam.data.source.remote.settings.Setting
 import com.mobisharnam.domain.interacter.ChatDetailUseCase
-import com.mobisharnam.domain.model.Friends
 import com.mobisharnam.domain.model.firebasedb.ChatModel
-import com.mobisharnam.domain.model.firebasedb.NewUser
 import com.mobisharnam.domain.response.Response
 import com.mobisharnam.domain.util.AppConstant
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -37,20 +30,20 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
         get() = _chatLiveData
 
     private val notificationId = ObservableField(0)
+    private val receiverNotificationId = ObservableField(0)
     private val userToken = ObservableField("")
-    private val friendToken = ObservableField("")
     private var chatId = ""
     val chatListModel = ObservableField(ArrayList<ChatModel>())
     val chatMessage = ObservableField("")
     val receiverName = ObservableField("")
     val userImageName = ObservableField("")
     val userStatus = ObservableField("")
-    val pendingMessageCount = ObservableField(0)
-    val allowRead = ObservableField(false)
+    private val pendingMessageCount = ObservableField(0)
+  //  var allowRead = false
     private val todayDateTime = SimpleDateFormat("hh:mm a", Locale.ENGLISH)
     private val yesterDayDateTime = SimpleDateFormat("MMM d, yyyy hh:mm a", Locale.ENGLISH)
     private val chatDateFormat = SimpleDateFormat("MMM d, yyyy", Locale.ENGLISH)
-    val chatDayDateFormat = SimpleDateFormat("d", Locale.ENGLISH)
+    private val chatDayDateFormat = SimpleDateFormat("d", Locale.ENGLISH)
     private val timer = object : CountDownTimer(3000L, 3000L) {
         override fun onTick(p0: Long) {
 
@@ -59,6 +52,16 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
         override fun onFinish() {
             setUserStatus(chatId)
         }
+    }
+
+    init {
+        chatDetailUseCase.allowRead = true
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+
+        chatDetailUseCase.allowRead = false
     }
 
     fun getChatDate(timeStamp: Long): String {
@@ -125,35 +128,33 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
             .child("${receiverId}_${getFireBaseAuth().uid}").setValue(notificationId)
     }
 
-    fun getPendingMessage(chatId: String) {
-        val chatReference = getDataBaseReference().child(AppConstant.CHAT_TABLE).child(chatId)
-        chatReference.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                var receiverCount = 0
-                var senderCount = 0
-                for (sp in snapshot.children) {
-                    sp.getValue<ChatModel>()?.let {
-                        if (!it.read) {
-                            if (getFireBaseAuth().uid == it.senderID) {
-                                senderCount++
-                            } else {
-                                receiverCount++
+    private fun getPendingMessage(chatId: String) {
+        viewModelScope.launch {
+            chatDetailUseCase.getPendingMessage(chatId).collect { response ->
+                when(response.status) {
+                    Response.Status.SUCCESS -> {
+                        var receiverCount = 0
+                        var senderCount = 0
+                        response.data?.forEach { chatModel ->
+                            if (!chatModel.read) {
+                                if (getFireBaseAuth().uid == chatModel.senderID) {
+                                    senderCount++
+                                } else {
+                                    receiverCount++
+                                }
                             }
                         }
+                        pendingMessageCount.set(receiverCount)
+                    }
+                    Response.Status.ERROR -> {
+
+                    }
+                    Response.Status.EXCEPTION -> {
+
                     }
                 }
-                pendingMessageCount.set(0)
-                Log.e(
-                    "PrintPendingCount",
-                    "count -> $senderCount -- $receiverCount ${pendingMessageCount.get()}"
-                )
-                pendingMessageCount.set(receiverCount)
             }
-
-            override fun onCancelled(error: DatabaseError) {
-
-            }
-        })
+        }
     }
 
     fun setSender(
@@ -214,76 +215,13 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
 
         chatMessage.set("")
 
-        Log.e("PrintAfterComplet","before addOnCompleteListener")
         references.push().setValue(chat).addOnCompleteListener {
-
-            Log.e("PrintAfterComplet","addOnCompleteListener")
-            references.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    for (sp in snapshot.children) {
-                        sp.getValue<ChatModel>()?.let {
-                            if (it.status == 1) {
-                                Log.e("PrintSnapKey","PrintSnapKey -> ${sp.key}")
-                                references.child(sp.key.toString()).child(AppConstant.STATUS).setValue(2)
-                            }
-                        }
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-
-                }
-            })
-
-            val friendReference = getDataBaseReference().child(AppConstant.FRIEND_TABLE)
-                .child(getFireBaseAuth().uid.toString())
-            friendReference.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    for (sp in snapshot.children) {
-                        sp.getValue<Friends>()?.let {
-                            if (it.chatId == chatId) {
-                                friendReference.child(sp.key.toString()).child(AppConstant.LAST_MESSAGE)
-                                    .setValue(message)
-                                friendReference.child(sp.key.toString()).child(AppConstant.TYPING)
-                                    .setValue("")
-                                friendReference.child(sp.key.toString()).child(AppConstant.PENDING_COUNT)
-                                    .setValue(0)
-                                friendReference.child(sp.key.toString()).child(AppConstant.DATE_TIME)
-                                    .setValue(System.currentTimeMillis())
-                            }
-                        }
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-
-                }
-            })
-
-            val receiverReferenceReference =
-                getDataBaseReference().child(AppConstant.FRIEND_TABLE).child(receiverId)
-            receiverReferenceReference.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    for (sp in snapshot.children) {
-                        sp.getValue<Friends>()?.let {
-                            if (it.chatId == chatId) {
-                                receiverReferenceReference.child(sp.key.toString())
-                                    .child(AppConstant.LAST_MESSAGE).setValue(message)
-                                receiverReferenceReference.child(sp.key.toString()).child(AppConstant.TYPING)
-                                    .setValue("")
-                                receiverReferenceReference.child(sp.key.toString())
-                                    .child(AppConstant.PENDING_COUNT).setValue(it.pendingCount + 1)
-                                receiverReferenceReference.child(sp.key.toString())
-                                    .child(AppConstant.DATE_TIME).setValue(System.currentTimeMillis())
-                            }
-                        }
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-
-                }
-            })
+            Log.e("PrintAfterComplet","before addOnCompleteListener")
+            viewModelScope.launch {
+                chatDetailUseCase.updateMessageStatus(references)
+                chatDetailUseCase.updateCurrentUserStatus(chatId,message)
+                chatDetailUseCase.updateFriendStatus(chatId,message,receiverId)
+            }
 
             val header = HashMap<String, String>()
             header[AppConstant.AUTHORIZATION] = AppConstant.SERVER_KEY
@@ -294,52 +232,37 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
                 message,
                 chatId,
                 notificationId.get() ?: 0,
+                receiverNotificationId.get() ?: 0,
                 token,
                 userToken.get() ?: ""
             )
+
+            Log.e("PrintReceiverNotification","send message -> ${notificationId.get()}")
         }.addOnFailureListener {
             Log.e("chatMessage", "chatMessage fail to send")
         }
     }
 
     fun setMarkAsRead(chatId: String) {
-        val friendReference = getDataBaseReference().child(AppConstant.FRIEND_TABLE)
-            .child(getFireBaseAuth().uid.toString())
-        friendReference.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                for (sp in snapshot.children) {
-                    sp.getValue<Friends>()?.let {
-                        if (it.chatId == chatId && allowRead.get() == true) {
-                            friendReference.child(sp.key.toString()).child(AppConstant.PENDING_COUNT)
-                                .setValue(0)
-                        }
+        viewModelScope.launch {
+            chatDetailUseCase.setMarkAsRead(chatId).collect { response ->
+                when(response.status) {
+                    Response.Status.SUCCESS -> {
+                        getPendingMessage(chatId)
                     }
-                }
-                getPendingMessage(chatId)
-            }
+                    Response.Status.ERROR -> {
 
-            override fun onCancelled(error: DatabaseError) {
+                    }
+                    Response.Status.EXCEPTION -> {
 
-            }
-        })
-
-        val chatReference = getDataBaseReference().child(AppConstant.CHAT_TABLE).child(chatId)
-        chatReference.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                for (sp in snapshot.children) {
-                    sp.getValue<ChatModel>()?.let {
-                        if (it.senderID != getFireBaseAuth().uid && allowRead.get() == true) {
-                            chatReference.child(sp.key.toString()).child(AppConstant.STATUS).setValue(3)
-                        }
                     }
                 }
             }
+        }
 
-            override fun onCancelled(error: DatabaseError) {
-
-            }
-
-        })
+        viewModelScope.launch {
+            chatDetailUseCase.setChatRead(chatId)
+        }
     }
 
     fun setTyping() {
@@ -364,28 +287,6 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
                 }
             }
         }
-        /*val friendReference = getDataBaseReference().child(AppConstant.FRIEND_TABLE)
-            .child(getFireBaseAuth().uid.toString())
-        friendReference.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                Log.e("friendReference", "friendReference")
-                for (sp in snapshot.children) {
-                    sp.getValue<Friends>()?.let {
-                        if (it.typingId != getFireBaseAuth().uid && it.typingId.isNotEmpty()) {
-                            timer.cancel()
-                            timer.start()
-                            userStatus.set(
-                                chatDetailUseCase.getContext().getString(R.string.alert_typing)
-                            )
-                        }
-                    }
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-
-            }
-        })*/
     }
 
     fun setUserStatus(chatId: String) {
@@ -398,9 +299,10 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
                 when(response.status) {
                     Response.Status.SUCCESS -> {
                         response.data?.let { user ->
+                            receiverNotificationId.set(user.notificationId)
+                            Log.e("PrintReceiverNotification","id -> ${user.notificationId}")
                             val calendar = Calendar.getInstance()
                             val lastSeenCalender = Calendar.getInstance()
-                            val todayCalender = Calendar.getInstance()
                             val yesterDayCalender = Calendar.getInstance()
                             lastSeenCalender.timeInMillis = user.lastSeen
                             yesterDayCalender.add(Calendar.DATE, -1)
@@ -450,57 +352,6 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
             }
         }
 
-        /*getDataBaseReference().child(AppConstant.USER_TABLE).child(receiverId)
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    snapshot.getValue<NewUser>()?.let {
-                        val calendar = Calendar.getInstance()
-                        val lastSeenCalender = Calendar.getInstance()
-                        val todayCalender = Calendar.getInstance()
-                        val yesterDayCalender = Calendar.getInstance()
-                        lastSeenCalender.timeInMillis = it.lastSeen
-                        yesterDayCalender.add(Calendar.DATE, -1)
-
-                        calendar[Calendar.HOUR_OF_DAY] = 0
-                        calendar[Calendar.MINUTE] = 0
-                        calendar[Calendar.SECOND] = 0
-                        calendar[Calendar.MILLISECOND] = 0
-
-                        if (it.online) {
-                            userStatus.set(
-                                chatDetailUseCase.getContext().getString(R.string.online)
-                            )
-                        } else if (lastSeenCalender.timeInMillis > calendar.timeInMillis) {
-                            val yesterDaySeen = todayDateTime.format(it.lastSeen)
-                            userStatus.set(
-                                "${
-                                    chatDetailUseCase.getContext()
-                                        .getString(R.string.last_seen_today)
-                                } $yesterDaySeen"
-                            )
-                        } else if (lastSeenCalender.timeInMillis < calendar.timeInMillis) {
-                            val lastSeen = todayDateTime.format(it.lastSeen)
-                            userStatus.set(
-                                "${
-                                    chatDetailUseCase.getContext()
-                                        .getString(R.string.last_seen_yesterday)
-                                } $lastSeen"
-                            )
-                        } else if (lastSeenCalender.timeInMillis < yesterDayCalender.timeInMillis) {
-                            val lastSeen = yesterDayDateTime.format(it.lastSeen)
-                            userStatus.set(
-                                "${
-                                    chatDetailUseCase.getContext().getString(R.string.last_seen)
-                                } $lastSeen"
-                            )
-                        }
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-
-                }
-            })*/
     }
 
     fun getNotificationId(chatId: String) {
@@ -513,7 +364,10 @@ class ChatDetailViewModel(private val chatDetailUseCase: ChatDetailUseCase) :
                     Response.Status.SUCCESS -> {
                         val notificationManager = chatDetailUseCase.getContext()
                             .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                        response.data?.let { notificationId -> notificationManager.cancel(notificationId) }
+                        response.data?.let { notificationId ->
+                            Log.e("getNotificationId","getNotificationId  $notificationId")
+                            notificationManager.cancel(notificationId)
+                        }
                     }
                     Response.Status.ERROR -> {
 

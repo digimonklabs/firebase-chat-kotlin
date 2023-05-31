@@ -17,11 +17,9 @@ object AppConstant {
     // Firebase Database
     const val USER_TABLE = "User"
     const val CHAT_TABLE = "Chat"
-    const val TYPING_TABLE = "Typing"
     const val FRIEND_TABLE = "Friend"
     const val INVITATION_TABLE = "Invitations"
     const val NOTIFICATION_TABLE = "NotificationTable"
-    const val READ_STATUS = "ReadStatus"
     const val USER_ONLINE = "online"
     const val LAST_SEEN = "lastSeen"
     const val MESSAGE_READ = "read"
@@ -32,20 +30,21 @@ object AppConstant {
     const val PENDING_COUNT = "pendingCount"
     const val DATE_TIME = "dateTime"
     const val STATUS = "status"
-    const val PENDING_MESSAGE_TABLE = "PendingMessage"
     var currentUser = ""
 
     // Firebase auth
     const val ERROR_USER_NOT_FOUND = "ERROR_USER_NOT_FOUND"
 
     // Fcm
+    const val IS_FROM_CHAT = "isFromChat"
     var notificationID = 0
     const val SEND = "send"
     const val TO = "to"
     const val DATA = "data"
     const val TITLE = "title"
     const val BODY = "body"
-    const val SENDER_ID = "senderId"
+    const val USER_TOKEN = "userToken"
+    const val FRIEND_TOKEN = "friendToken"
     const val RECEIVER_ID = "receiverId"
     const val CHAT_ID = "chatID"
     const val NOTIFICATION = "notification"
@@ -53,6 +52,6 @@ object AppConstant {
     const val APPLICATION_JSON = "application/json"
     const val AUTHORIZATION = "Authorization"
     const val NOTIFICATION_ID = "notificationId"
-    const val CURRENT_USER_TOKEN = "currentUserToken"
+    const val RECEIVER_NOTIFICATION_ID = "notificationId"
     const val SERVER_KEY = "key=AAAA63pJUSA:APA91bGB95AcEe6hLN4Op3y3lTSc96_M31UKxFYz7Enn0WJEXrOah5CTr-Cf2xuhSWEWuV9lawS-2EmZdsOVsvOb4YSnT5ttJUh40rXc077JX-82cpoWUVOuiQA9KI7BIOrAUqif2pmo"
 }
